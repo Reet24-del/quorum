@@ -11,7 +11,8 @@ confidence. Built for the AssemblyAI Dictation hackathon, submission deadline
 
 ## Repository
 
-`github.com/Reet24-del/quorum` (private until submission). Production:
+`github.com/Reet24-del/quorum` (public since 13 Sep 2026, including the owner's eval
+recordings in `eval/clips/`). Production:
 https://quorum-iota-three.vercel.app (Vercel, the owner's own account; `.vercel/` is
 gitignored). `npx vercel deploy --prod` from the repo root redeploys. **Commit and push after
 each completed change** — the owner asked for the repo to track the work continuously,
