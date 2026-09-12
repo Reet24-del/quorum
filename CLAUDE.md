@@ -48,7 +48,7 @@ public/app.js  --raw WAV-->  server.js  --transformed copy per lane-->  Assembly
 ```
 
 - `src/lanes.js` defines the lanes. Each lane has a `transform` (`none`, `normalize`,
-  `pad`, `stretch`, `gain`) applied by `src/audio.js` to the WAV before upload. It also
+  `pad`, `stretch`, `gain`, `noise`) applied by `src/audio.js` to the WAV before upload. It also
   exports `VOCABULARY`, which the server passes to `merge()`. Lanes and vocabulary are
   the demo's main tuning knobs.
 - `src/assembly.js` handles fan-out and lane dropout. A lane that errors or times out (20s; calls measured up to about 7s, and 8s was dropping whole clips)
@@ -57,6 +57,10 @@ public/app.js  --raw WAV-->  server.js  --transformed copy per lane-->  Assembly
   the voting lanes, not all lanes. The UI relies on that mapping.
 - `public/wav.js` is imported by the browser (`app.js`) and by Node (`src/audio.js`,
   tests), so it must stay environment-neutral: no DOM, no Node `Buffer` APIs.
+- `src/script.js` `guardScript()` runs before every merge, **in both `server.js` and
+  `eval.js`**. Failed lanes and lanes whose output is in the wrong script (default Latin)
+  don't vote. The two call sites once drifted apart (the eval let failed lanes vote), so
+  keep them on the same rule.
 - `src/align.js` is the core of the project. Read `docs/design.md` §3 before changing it.
 
 ### The merge (`src/align.js`)
@@ -95,6 +99,14 @@ These override the public docs. They are also recorded in the header of `src/ass
   parameter, compare transcripts, not status codes. This finding is why lanes transform
   audio instead of passing vocabulary.
 - It returns per-word `text` and `confidence` but **no timings**.
+- **The output language can't be pinned.** `language_code`, `language`,
+  `language_detection`, an `X-AAI-Language` header and `?language_code=` are all ignored.
+  On an accented voice the model sometimes answers in **Devanagari**, spelling English
+  phonetically. Padding and slowing make this likelier; faint noise didn't trigger it
+  once in screening. `wer.js` keeps `\p{M}` so a script switch scores as substitutions,
+  not as hundreds of percent of insertions.
+- ×2 gain only diverged on synthesised speech, because it clipped it. On real recordings
+  it matched the untouched transcript 19 times out of 20. That's why it was replaced by noise.
 - A call takes about 2.3–3.6s, not the documented 134ms. Responses include
   `llm_response`, which suggests an LLM pass. Parallel fan-out still works: 4 lanes cost
   about 1.3× one call.
@@ -108,6 +120,11 @@ These override the public docs. They are also recorded in the header of `src/ass
   pool.
 - `src/mock.js` is a **real capture** from the live API, not invented data. If you
   change the lanes, re-capture it the same way. Don't hand-edit confidences.
+- **Choose lanes with unlabelled screens only**: does a transform change the transcript,
+  and does it stay in English. Never use eval WER. Picking lanes by accuracy on the eval
+  set tunes them to their own answer key.
+- `eval/clips/13–32` are **real recordings** (`synthetic: false`). `npm run eval:real` is
+  the number to quote. 01–12 are synthesised placeholders.
 - `eval/clips/` holds **synthesised (macOS `say`) placeholders**, marked `synthetic: true`
   in the manifest. TTS is too clean to be a meaningful eval, and `eval.js` prints a warning
   whenever they're used. The submission number needs real recorded speech.

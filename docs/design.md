@@ -42,7 +42,7 @@ WAV encode (PCM S16LE)
                         server.js
                              │  transform + fan out, Promise.allSettled
                              ├──────────────────────────────▶ lane: raw
-                             ├──────────────────────────────▶ lane: loud     (2x gain)
+                             ├──────────────────────────────▶ lane: noisy    (-46 dB noise)
                              ├──────────────────────────────▶ lane: shifted  (200ms pad)
                              └──────────────────────────────▶ lane: slowed   (0.95x)
                                                                   │
@@ -206,6 +206,11 @@ multipart: audio = WAV or PCM S16LE, 16kHz, 80ms–2min, ≤40MB
   comparing transcripts did.
 - The API is **deterministic**: same audio three times gives the same text and the same
   confidence vector, on three clips.
+- The output **language can't be pinned**. Every language parameter tried (body,
+  header, query) is ignored. On an accented voice the model sometimes answers in
+  **Devanagari**, and padding and slowing make it likelier. `src/script.js` makes such
+  lanes sit out the vote. On 20 real recordings: untouched 30.5% WER, merge 16.7%,
+  beating every single lane.
 - Latency is 1.5–3.5s typical, ~7s at the tail. Responses carry `llm_response`, which
   suggests an LLM pass. The per-lane timeout is 20s.
 

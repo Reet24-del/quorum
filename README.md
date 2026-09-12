@@ -9,7 +9,7 @@ Built for the AssemblyAI Dictation API hackathon, 9–13 Sep 2026.
 ## The finding
 
 The Dictation model's output is **unstable under changes a listener can't hear.** Double
-the gain, add 200ms of silence, slow it by 5%, and you get a different transcript.
+in faint noise, add 200ms of silence, slow it by 5%, and you get a different transcript.
 
 Here is a real capture from `dictation.assemblyai.com`, one clip sent four ways:
 
@@ -17,7 +17,7 @@ Here is a real capture from `dictation.assemblyai.com`, one clip sent four ways:
 spoken      ask Saoirse to check the kustomize overlay on etcd
 
 Untouched   Ask Sirsha  to check the customize overlay on it.
-Amplified   Ask Saoirse to check the customize overlay on Ed.
+Noised      Ask Saoirse to check the customize overlay on it.
 Padded      Ask Saoirse to check the customize overlay on Edged.
 Slowed      Ask Saoirse to check the customize overlay on it.
 ─────────────────────────────────────────────────────────────────
@@ -44,34 +44,43 @@ to use and uses it **only to break ties between spellings a lane actually heard.
 three lanes say `Angozi` and one says `Ngozi`, a known `Ngozi` wins. It can never insert
 a word no lane produced, so it can't hallucinate a name into your transcript.
 
-## Results so far
+## Results
 
-Word error rate on 12 clips, six of them loaded with rare names and niche tooling:
+**On 20 real recordings.** One speaker, a laptop mic, and sentences loaded with rare
+names and niche tools:
 
-| Untouched | Amplified | Padded | Slowed | **Quorum** |
+| Untouched | Noised | Padded | Slowed | **Quorum** |
 |---|---|---|---|---|
-| 15.9% | 13.1% | 12.1% | 15.0% | **13.1%** |
+| 30.5% | 19.0% | 33.9% | 35.1% | **16.7%** |
 
-Quorum beats the untouched recording. It does **not** yet beat the best single variant,
-and you can't know in advance which variant that will be. Where it loses, the cause is
-visible in the data: three lanes agree on a wrong word at the *same* confidence as the
-one lane that got it right, which leaves the vote nothing to act on. That's the case the
-vocabulary tie-breaker targets.
+Quorum beats every single lane. It makes **45% fewer errors than sending the recording
+untouched**, and 12% fewer than the best variant. It does this without knowing which
+variant will be right. On each clip it ties the best lane (19 of 20), but the best lane
+changes from clip to clip, so across the whole set it beats any fixed choice.
 
-**Vocabulary, measured.** With the fixed list in `src/lanes.js` the score doesn't move
-(13.1%). That's expected: the list was written before the hard clips and doesn't contain
-their names. With an *oracle* list, meaning the answer key (a ceiling, not a result), it
-reaches **12.1%**. That recovers `Ngozi` and matches the best single variant. So the
-tie-breaker works exactly when you've listed the names you'll say, which is the realistic
-case for a team's own vocabulary.
+With the fixed vocabulary list the merge reaches 16.1%. With an oracle list (the answer
+key, so a ceiling, not a result) it reaches 15.5%.
+
+**The model switches language on its own.** On an accented voice it sometimes answers in
+**Devanagari**, spelling the English phonetically. 10 of the 80 lane calls did this, and
+untouched audio did it on 2 of the 20 clips. It can't be switched off: `language_code`,
+`language_detection`, a header and a query parameter were all tried, and all were
+ignored. Quorum's script guard makes any lane that answers in another script sit out the
+vote. The noise lane never switched script, and it rescued both clips where the untouched
+audio did.
 
 **Control: the disagreement is real, not noise.** The API is deterministic. We sent
-identical untouched audio three times on three clips and got identical text and
-identical per-word confidences every time. Every difference between lanes is caused by
-the transform.
+identical audio three times on three clips and got identical text and identical per-word
+confidences each time. Every difference between lanes comes from the transform.
 
-**Caveat:** every eval clip is synthesised speech (macOS `say`), which is cleaner than a
-real voice. These numbers show the mechanism works. They are not the final result.
+**How the lanes were chosen, and the caveat.** Noise replaced an earlier ×2-gain lane
+after a screen on these same 20 recordings. The screen used only *unlabelled* measures
+(does a transform change the transcript, does it stay in English) and never accuracy,
+so the answer key played no part. It is still the same audio, and one speaker. Treat
+these numbers as optimistic until they hold on new recordings and new voices.
+
+On 12 synthesised clips (macOS `say`), untouched audio scores 15.9% and Quorum 13.1%.
+Synthetic speech is too clean to separate the lanes much.
 
 Other things the probe measured, all of which differ from the public docs:
 
