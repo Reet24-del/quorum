@@ -1,6 +1,11 @@
 # The hosted site needs public/, api/, src/ and vercel.json - nothing else.
 # eval/ holds the owner's own voice recordings: never upload them.
 eval/
+# Local-only entry points. Vercel treats a root server.js as the whole app and routes
+# every request to it, shadowing api/ - so it must never be uploaded.
+server.js
+probe.js
+eval.js
 test/
 docs/
 demo/

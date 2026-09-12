@@ -79,6 +79,10 @@ public/app.js  --raw WAV-->  server.js  --transformed copy per lane-->  Assembly
   **must never fall back to an env key**; `test/api.test.js` pins that. There's no
   hosted `/api/eval-clip`, so `record.js` shows a local-only notice on 404.
   `.vercelignore` keeps `eval/` (the owner's voice) out of every upload.
+  **Never let `server.js` reach Vercel.** Vercel treats a root `server.js` as the whole
+  app, routes every request (including `/api/*`) to it, and saves a Node-server preset on
+  the project. That shadowed the functions on the first deploy. `.vercelignore` excludes
+  it, and `vercel.json` pins `"framework": null` with `"outputDirectory": "public"`.
 - `public/wav.js` is imported by the browser (`app.js`) and by Node (`src/audio.js`,
   tests), so it must stay environment-neutral: no DOM, no Node `Buffer` APIs.
 - `src/script.js` `guardScript()` runs before every merge, **in both `src/quorum.js` and

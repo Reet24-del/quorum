@@ -1,5 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": "public",
   "cleanUrls": true,
   "rewrites": [
     { "source": "/transcribe", "destination": "/api/dropin" }
