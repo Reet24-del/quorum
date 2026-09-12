@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+*.log
+
+# never commit credentials - the API key belongs in the shell environment only
+.env
+.env.*

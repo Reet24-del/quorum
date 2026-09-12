@@ -1,0 +1,110 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this is
+
+Quorum sends one recorded clip to the AssemblyAI Dictation endpoint several times in
+parallel, each copy transformed differently, then merges the transcripts using per-word
+confidence. Built for the AssemblyAI Dictation hackathon, submission deadline
+**13 Sep 2026**. Node 18+, zero dependencies, no build step.
+
+## Commands
+
+```bash
+npm test                      # all four suites; each is a plain node script
+node test/align.test.js       # run one suite - any file in test/ runs standalone
+npm run mock                  # server on :5173 with canned lanes, no API key needed
+npm start                     # live server, needs ASSEMBLYAI_API_KEY
+npm run probe                 # interrogates the live endpoint; run before trusting any API assumption
+npm run eval                  # WER table from eval/clips/ + eval/manifest.json
+QUORUM_MOCK=1 node eval.js    # exercises the eval harness without spending API calls
+```
+
+There is no test framework. Each test file prints PASS/FAIL lines and exits non-zero on
+failure. Add assertions with the local `check(name, actual, expected)` helper in the file.
+
+Env vars: `ASSEMBLYAI_API_KEY`, `QUORUM_MOCK=1`, `QUORUM_ENDPOINT`, `QUORUM_MODEL`,
+`PORT`, and `QUORUM_SEND_HINTS=1` (dormant, see below). Never write the key into a file.
+
+## Architecture
+
+```
+public/app.js  --raw WAV-->  server.js  --transformed copy per lane-->  AssemblyAI  (Promise.allSettled)
+                                 |
+                          src/align.js merge()  -->  { lanes, votingLaneIds, merged, timing }  -->  app.js renders
+```
+
+- `src/lanes.js` defines the lanes. Each lane has a `transform` (`none`, `normalize`,
+  `pad`, `stretch`, `gain`) applied by `src/audio.js` to the WAV before upload. The lanes
+  are the demo's main tuning knob.
+- `src/assembly.js` handles fan-out and lane dropout. A lane that errors or times out (8s)
+  comes back with an `error` field and no vote. Only if every lane fails does the call
+  throw. The server passes `votingLaneIds` because the merge's candidate indices refer to
+  the voting lanes, not all lanes. The UI relies on that mapping.
+- `public/wav.js` is imported by the browser (`app.js`) and by Node (`src/audio.js`,
+  tests), so it must stay environment-neutral: no DOM, no Node `Buffer` APIs.
+- `src/align.js` is the core of the project. Read `docs/design.md` §3 before changing it.
+
+### The merge (`src/align.js`)
+
+1. **Align**: progressive Needleman–Wunsch across lanes. Scoring combines text similarity
+   and time-span overlap. If no word has a non-zero `end`, it switches to text-only
+   automatically (`hasTimings`).
+2. **Segment**: columns where every lane agrees after `norm()` become anchors and are
+   never rewritten. The remaining runs are disputes.
+3. **Vote**: disputes are settled between whole **phrases**, not single words. That lets
+   a one-word lane (`kubectl`) beat a two-word majority (`cube cuttle`).
+   `score = α·votes/L + (1−α)·meanConfidence`.
+
+Invariants you won't see from reading one function:
+
+- `norm()` strips whitespace, so `Roll back` and `Rollback` count as the same ballot. The
+  output spelling is picked by `electForm()` (most common form wins, ties go to higher
+  confidence) on **both** the anchor path and the dispute path. Emitting `col[0].text` or
+  the first-seen form reintroduces a bug that lost real eval cases.
+- A lone lane beats a group of `k` when `c_solo − c_group > α(k−1)/((1−α)L)`. Adding lanes
+  makes it *harder* for a correct outlier to win. Don't add lanes without adjusting `α`.
+
+## Facts about the live API (probed 12 Sep 2026)
+
+These override the public docs. They are also recorded in the header of `src/assembly.js`.
+
+- The endpoint **accepts and silently ignores** `keyterms`, `prompt`, `word_boost`, and
+  similar fields. Output is byte-identical with and without them, even on clips where the
+  model mishears the hinted term. A 200 from an extra field proves nothing. To test a
+  parameter, compare transcripts, not status codes. This finding is why lanes transform
+  audio instead of passing vocabulary.
+- It returns per-word `text` and `confidence` but **no timings**.
+- A call takes about 2.3–3.6s, not the documented 134ms. Responses include
+  `llm_response`, which suggests an LLM pass. Parallel fan-out still works: 4 lanes cost
+  about 1.3× one call.
+
+## Gotchas
+
+- `src/assembly.js` reads env vars at **call time** through accessor functions. Don't
+  hoist them into module-level constants. The dropout test redirects `QUORUM_ENDPOINT` to
+  a local stub after import, and hoisting once made that test hit the live API.
+- `decodeWav` has to honour `byteOffset`, because a Node `Buffer` is a view into a shared
+  pool.
+- `src/mock.js` is a **real capture** from the live API, not invented data. If you
+  change the lanes, re-capture it the same way. Don't hand-edit confidences.
+- `eval/clips/` holds **synthesised (macOS `say`) placeholders**, marked `synthetic: true`
+  in the manifest. TTS is too clean to be a meaningful eval, and `eval.js` prints a warning
+  whenever they're used. The submission number needs real recorded speech.
+- `test/wav.test.js` reads `eval/clips/01.wav` and skips those assertions if the file is
+  missing.
+- `index.html` and `app.js` share a set of CSS class names (`.fixed`, `.won`, `.lost`,
+  `.dropped`, `.opt`, `.timing`, …). Renaming one means updating both files.
+
+## Docs and their state
+
+- `docs/design.md` §11 is the **visual spec**: warm dark palette, brass (`#E3A44A`)
+  reserved for words the vote decided, Spectral for transcripts, Karla for UI, IBM Plex
+  Mono for measurements. Update it before changing how the page looks.
+- **Out of date:** `docs/prd.html` and `docs/design.md` §1–5 and §7 still describe
+  vocabulary hints as the mechanism. The failure-modes, testing, file-map and visual
+  sections are current. Check the code before relying on the stale sections.
+- The PRD is also published at
+  https://claude.ai/code/artifact/e8480306-5496-4508-b35c-262eaa28a172. It moved into
+  `docs/`, so republishing requires passing that URL, not just the file path.

@@ -1,0 +1,38 @@
+[
+  {
+    "file": "01.wav",
+    "truth": "push the kubectl config to staging and tell Priya",
+    "voice": "Samantha",
+    "synthetic": true
+  },
+  {
+    "file": "02.wav",
+    "truth": "ask Marcus to rebase the Terraform branch before the Vercel deploy",
+    "voice": "Alex",
+    "synthetic": true
+  },
+  {
+    "file": "03.wav",
+    "truth": "the Postgres webhook is returning a JWT error in production",
+    "voice": "Daniel",
+    "synthetic": true
+  },
+  {
+    "file": "04.wav",
+    "truth": "Yuki said the Supabase migration is idempotent now",
+    "voice": "Karen",
+    "synthetic": true
+  },
+  {
+    "file": "05.wav",
+    "truth": "roll back nginx on the Toronto cluster and ping Rahul",
+    "voice": "Samantha",
+    "synthetic": true
+  },
+  {
+    "file": "06.wav",
+    "truth": "the gRPC endpoint needs an OAuth token from Aanya",
+    "voice": "Alex",
+    "synthetic": true
+  }
+]

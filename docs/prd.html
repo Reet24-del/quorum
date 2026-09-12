@@ -1,0 +1,468 @@
+<title>Quorum PRD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+
+<style>
+  :root {
+    --ground:   #F6F7F5;
+    --raise:    #FFFFFF;
+    --ink:      #1B2422;
+    --muted:    #667370;
+    --faint:    #8D9A95;
+    --rule:     #DEE3DF;
+    --accent:   #1F6F5C;
+    --accent-w: #E4EFEA;
+    --dispute:  #A9651F;
+    --dispute-w:#F5EADB;
+    --shadow:   0 1px 2px rgba(27,36,34,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:   #101513;
+      --raise:    #161D1B;
+      --ink:      #E6EBE7;
+      --muted:    #94A19B;
+      --faint:    #6E7C77;
+      --rule:     #242E2B;
+      --accent:   #55C4A3;
+      --accent-w: #12292322;
+      --dispute:  #DBA163;
+      --dispute-w:#2A211622;
+      --shadow:   none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:   #101513;
+    --raise:    #161D1B;
+    --ink:      #E6EBE7;
+    --muted:    #94A19B;
+    --faint:    #6E7C77;
+    --rule:     #242E2B;
+    --accent:   #55C4A3;
+    --accent-w: #12292322;
+    --dispute:  #DBA163;
+    --dispute-w:#2A211622;
+    --shadow:   none;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: Newsreader, Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 64px 24px 120px;
+  }
+
+  .page { max-width: 720px; margin: 0 auto; }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  h1 {
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: clamp(34px, 6vw, 46px);
+    font-weight: 700; letter-spacing: -.022em; line-height: 1.06;
+    margin: 10px 0 12px; text-wrap: balance;
+  }
+  .thesis {
+    font-size: 20px; line-height: 1.5; color: var(--muted);
+    margin: 0 0 30px; text-wrap: balance; max-width: 34em;
+  }
+
+  .facts {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+    gap: 1px; background: var(--rule);
+    border: 1px solid var(--rule); border-radius: 3px; overflow: hidden;
+    margin-bottom: 56px;
+  }
+  .facts div { background: var(--ground); padding: 12px 14px; }
+  .facts dt {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 3px;
+  }
+  .facts dd {
+    font-family: "IBM Plex Sans", sans-serif; font-size: 14px; font-weight: 600;
+    margin: 0; font-variant-numeric: tabular-nums;
+  }
+
+  section { margin-bottom: 54px; }
+
+  h2 {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 13px; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 6px; padding-bottom: 9px;
+    border-bottom: 1px solid var(--rule);
+  }
+  h2 .n {
+    font-family: "IBM Plex Mono", monospace; color: var(--faint);
+    font-weight: 400; margin-right: 10px;
+  }
+  h3 {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 16px; font-weight: 600; letter-spacing: -.005em;
+    margin: 28px 0 8px;
+  }
+  p { margin: 14px 0; max-width: 65ch; }
+  strong { font-weight: 600; }
+  em { font-style: italic; color: var(--muted); }
+
+  ul, ol { margin: 14px 0; padding-left: 22px; max-width: 65ch; }
+  li { margin-bottom: 9px; }
+  li::marker { color: var(--faint); }
+
+  code, .mono {
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: .86em;
+  }
+  code { color: var(--accent); }
+
+  /* ---- the merge illustration: real output from the aligner's test run ---- */
+  .merge {
+    border: 1px solid var(--rule); border-radius: 4px; background: var(--raise);
+    padding: 20px; margin: 22px 0; box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .merge .said {
+    display: grid; grid-template-columns: 104px 1fr; gap: 14px;
+    align-items: baseline; padding: 7px 0; min-width: 430px;
+  }
+  .merge .said + .said { border-top: 1px solid var(--rule); }
+  .merge .who {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--faint);
+  }
+  .merge .line {
+    font-family: "IBM Plex Mono", monospace; font-size: 13.5px; line-height: 1.75;
+    color: var(--muted);
+  }
+  .merge .out {
+    margin-top: 10px; padding-top: 14px; border-top: 2px solid var(--ink);
+    min-width: 430px;
+  }
+  .merge .out .line { color: var(--ink); font-weight: 500; }
+  .win  { color: var(--accent); font-weight: 600; }
+  .miss { color: var(--dispute); }
+  .conf {
+    font-size: 10.5px; color: var(--faint); vertical-align: .12em;
+    margin-left: 2px; font-variant-numeric: tabular-nums;
+  }
+  .caption {
+    font-size: 13.5px; color: var(--muted); margin: 10px 0 0; max-width: 62ch;
+  }
+
+  /* ---- requirements ---- */
+  .req { border-top: 1px solid var(--rule); padding: 16px 0; }
+  .req:last-child { border-bottom: 1px solid var(--rule); }
+  .req .top { display: flex; gap: 11px; align-items: baseline; }
+  .req .title {
+    font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 15.5px;
+  }
+  .req .ac {
+    font-family: "IBM Plex Mono", monospace; font-size: 12.5px; line-height: 1.72;
+    color: var(--muted); margin: 9px 0 0; padding-left: 15px;
+    border-left: 2px solid var(--rule); max-width: 64ch;
+  }
+
+  .chip {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 2.5px 7px; border-radius: 3px; white-space: nowrap;
+    border: 1px solid var(--rule); color: var(--muted); background: var(--raise);
+  }
+  .chip.p0  { border-color: var(--accent); color: var(--accent); background: var(--accent-w); }
+  .chip.blk { border-color: var(--dispute); color: var(--dispute); background: var(--dispute-w); }
+
+  /* ---- metrics + schedule ---- */
+  .metric {
+    display: grid; grid-template-columns: 1fr auto; gap: 16px;
+    padding: 11px 0; border-top: 1px solid var(--rule); align-items: baseline;
+  }
+  .metric:last-child { border-bottom: 1px solid var(--rule); }
+  .metric .target {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 500;
+    color: var(--accent); font-variant-numeric: tabular-nums; text-align: right;
+  }
+
+  .slot {
+    display: grid; grid-template-columns: 116px 1fr 46px; gap: 16px;
+    padding: 12px 0; border-top: 1px solid var(--rule); align-items: baseline;
+  }
+  .slot:last-child { border-bottom: 1px solid var(--rule); }
+  .slot .when {
+    font-family: "IBM Plex Mono", monospace; font-size: 11.5px;
+    letter-spacing: .04em; color: var(--faint); text-transform: uppercase;
+  }
+  .slot .hrs {
+    font-family: "IBM Plex Mono", monospace; font-size: 12.5px;
+    color: var(--muted); text-align: right; font-variant-numeric: tabular-nums;
+  }
+  .slot .what { font-size: 15.5px; }
+  .slot.now { background: var(--accent-w); margin: 0 -12px; padding: 12px; border-radius: 3px; }
+
+  .q { padding: 14px 0; border-top: 1px solid var(--rule); }
+  .q:last-child { border-bottom: 1px solid var(--rule); }
+  .q .ask { display: flex; gap: 11px; align-items: baseline; }
+  .q .ask p { margin: 0; font-weight: 500; }
+  .q .then { font-size: 14.5px; color: var(--muted); margin: 7px 0 0 0; }
+
+  footer {
+    margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule);
+    font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--faint);
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+
+  @media (max-width: 560px) {
+    body { padding: 40px 18px 80px; font-size: 16px; }
+    .slot { grid-template-columns: 1fr auto; }
+    .slot .when { grid-column: 1 / -1; }
+  }
+</style>
+
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Product requirements &middot; v1 &middot; 11 Sep 2026</div>
+    <h1>Quorum</h1>
+    <p class="thesis">Transcribe every utterance three ways at once, then let the words vote.</p>
+
+    <dl class="facts">
+      <div><dt>Status</dt><dd>In build</dd></div>
+      <div><dt>Ships</dt><dd>13 Sep 2026</dd></div>
+      <div><dt>Budget</dt><dd>~44 hrs</dd></div>
+      <div><dt>Team</dt><dd>1&ndash;4</dd></div>
+      <div><dt>Venue</dt><dd>AssemblyAI</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2><span class="n">01</span>Problem</h2>
+    <p>Dictation is accurate on ordinary prose and unreliable on exactly the words that are slowest to type: colleagues' names, CLI tools, product nouns, internal jargon. <code>kubectl</code> comes back as "cube cuttle." The person dictating stops mid-flow to fix it, and the promised speed advantage evaporates.</p>
+    <p>The Dictation API already has the cure. Pass a list of expected terms alongside the audio and word error rate drops <strong>10.2%</strong>, concentrated on precisely these names and identifiers. But the hint has to be chosen <em>before</em> the person speaks, and real speech is mixed-domain: one sentence holds a teammate's name, a deployment command, and plain English. Priming for one degrades the others &mdash; a lane primed with dev vocabulary will confidently turn "staging and" into "stagehand."</p>
+    <p>So the feature that fixes dictation is, in practice, unusable. Every product built on it has to guess a domain up front and eat the errors everywhere else.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">02</span>The mechanism</h2>
+    <p>Don't guess &mdash; send the clip to every hint set at once. The endpoint answers in ~134 ms, so three calls issued in parallel cost roughly the wall-clock of one. Each response carries a confidence score for every individual word. Where the lanes disagree, the most confident phrase wins.</p>
+
+    <div class="merge">
+      <div class="said">
+        <span class="who">A &middot; no hints</span>
+        <span class="line">push the <span class="miss">cube cuttle</span><span class="conf">·42</span> config to staging and tell <span class="miss">prea</span><span class="conf">·38</span></span>
+      </div>
+      <div class="said">
+        <span class="who">B &middot; dev terms</span>
+        <span class="line">push the <span class="win">kubectl</span><span class="conf">·94</span> config to <span class="miss">stagehand</span><span class="conf">·52</span> tell <span class="miss">prea</span><span class="conf">·39</span></span>
+      </div>
+      <div class="said">
+        <span class="who">C &middot; contacts</span>
+        <span class="line">push the <span class="miss">cube cuttle</span><span class="conf">·45</span> config to staging and tell <span class="win">Priya</span><span class="conf">·91</span></span>
+      </div>
+      <div class="said out">
+        <span class="who">Quorum</span>
+        <span class="line">push the <span class="win">kubectl</span> config to <span class="win">staging and</span> tell <span class="win">Priya</span></span>
+      </div>
+    </div>
+    <p class="caption">Verified output of the aligner's test suite. Note that <strong>no individual lane is correct</strong> &mdash; B knows <code>kubectl</code> but breaks "staging and"; C knows Priya but not the tool. The merged line is a sentence none of the three returned.</p>
+
+    <p>Merging happens on <em>phrases</em>, not words. Lane B heard one word where A and C heard two, so word-by-word voting would let the two-vote majority "cube cuttle" survive. Grouping the disputed span first lets a single confident lane outvote a confident-sounding pair.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">03</span>Goals</h2>
+    <ul>
+      <li><strong>Beat every single lane.</strong> On mixed-domain speech the merged transcript is more accurate than any one hint set applied alone.</li>
+      <li><strong>Stay inside the typing illusion.</strong> Fanning out must not make the round trip feel slower than a single call.</li>
+      <li><strong>Be self-evident.</strong> A viewer understands the mechanism from the screen alone, without narration.</li>
+      <li><strong>Produce a number, not a vibe.</strong> Ship a word-error-rate table, measured on recorded audio with written ground truth.</li>
+      <li><strong>Place in the top ten</strong> at the AssemblyAI Dictation hackathon.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">04</span>Non-goals</h2>
+    <ul>
+      <li><strong>Not a system-wide dictation tool.</strong> No native overlay typing into the focused app &mdash; that needs accessibility permissions and would consume the entire budget. It would also hide the three lanes, which are the point.</li>
+      <li><strong>No streaming or live partials.</strong> The endpoint is synchronous; push-to-talk means we own turn detection, which is an advantage, not a gap.</li>
+      <li><strong>Hint sets do not adapt.</strong> Lane vocabularies are static config. Learning them from user corrections is a separate product.</li>
+      <li><strong>No diarization or multi-speaker handling.</strong> One person, one microphone.</li>
+      <li><strong>Exactly three lanes in v1.</strong> The aligner takes any <em>N</em>; the demo ships three, because three is the smallest number where voting means anything.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">05</span>User stories</h2>
+
+    <h3>The person dictating</h3>
+    <ul>
+      <li>As someone dictating a work note, I want a teammate's name and a CLI tool spelled correctly <em>in the same sentence</em>, so I don't stop to hand-fix either one.</li>
+      <li>As someone dictating, I want the transcript back in about the time one transcription takes, so speaking still beats typing.</li>
+      <li>As someone dictating, I want to see which words were contested, so I know where to glance before I trust the output.</li>
+    </ul>
+
+    <h3>The judge watching the demo</h3>
+    <ul>
+      <li>As a judge, I want to see the competing transcripts and the merged result together, so I understand the idea without a walkthrough.</li>
+      <li>As a judge, I want the latency cost of fanning out stated on screen, so I can tell whether the accuracy was bought cheaply.</li>
+    </ul>
+
+    <h3>Edges</h3>
+    <ul>
+      <li>When all three lanes agree, the output passes through unchanged and reports zero disputes.</li>
+      <li>When one lane errors or times out, the merge proceeds on the survivors rather than failing the request.</li>
+      <li>When no API key is present, the app runs on canned responses so the interface can be built without spending credits.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">06</span>Requirements</h2>
+
+    <div class="req">
+      <div class="top"><span class="chip p0">P0</span><span class="title">Push-to-talk capture</span></div>
+      <p class="ac">Given the mic is permitted, when the user holds the button or spacebar, then audio records until release and is encoded as 16&nbsp;kHz mono PCM WAV. Clips shorter than 80&nbsp;ms are discarded silently; clips are capped at 2 minutes.</p>
+    </div>
+
+    <div class="req">
+      <div class="top"><span class="chip p0">P0</span><span class="title">Parallel fan-out</span></div>
+      <p class="ac">Given a recorded clip, when it is submitted, then all lanes are dispatched concurrently and the response reports both wall-clock elapsed and the sum of individual lane times, so the parallelism is visible rather than claimed.</p>
+    </div>
+
+    <div class="req">
+      <div class="top"><span class="chip p0">P0</span><span class="title">Cross-lane word alignment</span></div>
+      <p class="ac">Given N transcripts of one clip, when aligned, then words are matched on combined text similarity and time-span overlap, tolerating differing word counts. Verified by test fixture where one lane returns 8 words and the others return 10.</p>
+    </div>
+
+    <div class="req">
+      <div class="top"><span class="chip p0">P0</span><span class="title">Phrase-level dispute resolution</span></div>
+      <p class="ac">Given an aligned span where lanes disagree, when resolved, then the winner is scored on vote count and mean confidence together, and a lone high-confidence phrase can defeat a low-confidence majority. Spans of unanimous agreement are never rewritten.</p>
+    </div>
+
+    <div class="req">
+      <div class="top"><span class="chip p0">P0</span><span class="title">Three-lane display</span></div>
+      <p class="ac">Given a completed merge, when rendered, then each lane's sentence appears aligned to the others with contested spans marked won or lost, and the merged sentence is the visual focus.</p>
+    </div>
+
+    <div class="req">
+      <div class="top"><span class="chip p0">P0</span><span class="title">Accuracy measurement</span></div>
+      <p class="ac">Given a fixed set of at least 20 recorded utterances with hand-written ground truth, when evaluated, then the report gives word error rate for each lane alone and for the merge, on identical audio.</p>
+    </div>
+
+    <div class="req">
+      <div class="top"><span class="chip">P1</span><span class="title">Live hint editing</span></div>
+      <p class="ac">The three vocabularies are editable in the interface, so a judge can add their own name and immediately hear it recognized.</p>
+    </div>
+
+    <div class="req">
+      <div class="top"><span class="chip">P1</span><span class="title">Lane failure tolerance</span></div>
+      <p class="ac">A lane that errors or exceeds its timeout is dropped with a visible marker; the merge runs on whatever returned.</p>
+    </div>
+
+    <div class="req">
+      <div class="top"><span class="chip">P2</span><span class="title">Audio-variation lanes</span></div>
+      <p class="ac">Fallback if hint parameters prove unavailable: lanes differ by gain normalisation and clip-boundary padding instead of vocabulary. Keeps the whole thesis intact on a different axis.</p>
+    </div>
+
+    <div class="req">
+      <div class="top"><span class="chip">P2</span><span class="title">Calibrated lane weights</span></div>
+      <p class="ac">Per-lane confidence multipliers fitted on the eval set, correcting for a primed lane's tendency toward overconfidence. Hook already exists in the merge options.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">07</span>Success metrics</h2>
+
+    <h3>Leading &mdash; measured during the build</h3>
+    <div class="metric"><span>Utterances where the merge beats the best single lane</span><span class="target">&ge; 60%</span></div>
+    <div class="metric"><span>Wall-clock latency for a three-lane fan-out, p50</span><span class="target">&le; 250 ms</span></div>
+    <div class="metric"><span>Fan-out cost against a single call</span><span class="target">&le; 1.4&times;</span></div>
+    <div class="metric"><span>Test viewers who explain the mechanism back correctly, unprompted</span><span class="target">3 of 3</span></div>
+
+    <h3>Lagging &mdash; measured at judging</h3>
+    <div class="metric"><span>Placement</span><span class="target">Top 10</span></div>
+    <div class="metric"><span>A technical follow-up question from an AssemblyAI engineer <em>&mdash; proxy for novelty</em></span><span class="target">&ge; 1</span></div>
+  </section>
+
+  <section>
+    <h2><span class="n">08</span>Open questions</h2>
+
+    <div class="q">
+      <div class="ask"><span class="chip blk">Blocking</span><p>Does the beta host accept vocabulary hints, and under what parameter names?</p></div>
+      <p class="then">Everything rests on this. Probe it before writing another line. If hints are unavailable, the lanes switch to the audio-variation axis (P2) and the thesis survives intact. <em>Engineering &mdash; tonight.</em></p>
+    </div>
+
+    <div class="q">
+      <div class="ask"><span class="chip blk">Blocking</span><p>What is the concurrency limit, and does three calls per utterance fit the credit grant?</p></div>
+      <p class="then">A per-key concurrency cap of one would serialise the lanes and destroy the latency claim. <em>Engineering &mdash; ask in Discord tonight.</em></p>
+    </div>
+
+    <div class="q">
+      <div class="ask"><span class="chip">Open</span><p>Are confidence scores comparable across differently-primed lanes?</p></div>
+      <p class="then">A lane primed with dev vocabulary may be confidently wrong on prose, which would bias every vote. Mitigation is already stubbed: per-lane weights fitted on the eval set. <em>Resolve during implementation.</em></p>
+    </div>
+
+    <div class="q">
+      <div class="ask"><span class="chip">Open</span><p>Does the beta return per-word timings?</p></div>
+      <p class="then">Alignment uses time overlap alongside text similarity. Without timings it degrades to text-only matching &mdash; workable, measurably worse on repeated words. <em>Confirm with the first live response.</em></p>
+    </div>
+
+    <div class="q">
+      <div class="ask"><span class="chip">Open</span><p>Is 20 utterances enough to claim a result?</p></div>
+      <p class="then">Twenty is the floor for a credible slide; forty is better if recording time allows. Report the count alongside the number either way. <em>Data &mdash; before the writeup.</em></p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">09</span>Schedule</h2>
+    <p>Two days, hard stop. Sequence matters more than completeness &mdash; the endpoint probe gates lane design, and the eval gates the claim.</p>
+
+    <div class="slot now">
+      <span class="when">Thu evening</span>
+      <span class="what">Probe the endpoint. Capture &rarr; POST &rarr; text on screen, one lane only.</span>
+      <span class="hrs">3h</span>
+    </div>
+    <div class="slot">
+      <span class="when">Fri morning</span>
+      <span class="what">Fan out to three lanes. Record the wall-clock figure &mdash; it is a slide by itself.</span>
+      <span class="hrs">2h</span>
+    </div>
+    <div class="slot">
+      <span class="when">Fri afternoon</span>
+      <span class="what">Alignment and voting. The hard part, and already written &mdash; wire it to live responses.</span>
+      <span class="hrs">6h</span>
+    </div>
+    <div class="slot">
+      <span class="when">Fri evening</span>
+      <span class="what">The three-lane view. Make the disagreement legible at a glance.</span>
+      <span class="hrs">5h</span>
+    </div>
+    <div class="slot">
+      <span class="when">Sat morning</span>
+      <span class="what">Record 20 utterances, write ground truth, compute the error-rate table.</span>
+      <span class="hrs">4h</span>
+    </div>
+    <div class="slot">
+      <span class="when">Sat midday</span>
+      <span class="what">Feature freeze. Ninety-second video, README, submit.</span>
+      <span class="hrs">3h</span>
+    </div>
+    <p class="caption">Submit early. Ten prizes are on offer, which rewards a finished small thing over an ambitious broken one.</p>
+  </section>
+
+  <footer>
+    <span>Quorum &middot; PRD v1</span>
+    <span>AssemblyAI Dictation Hackathon &middot; 9&ndash;13 Sep 2026</span>
+  </footer>
+
+</div>

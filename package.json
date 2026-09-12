@@ -1,0 +1,13 @@
+{
+  "name": "quorum",
+  "version": "0.1.0",
+  "description": "Transcribe every utterance three ways at once, then let the words vote.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "mock": "QUORUM_MOCK=1 node server.js",
+    "probe": "node probe.js",
+    "eval": "node eval.js",
+    "test": "node test/align.test.js && node test/wer.test.js && node test/wav.test.js && node test/dropout.test.js"
+  }
+}
