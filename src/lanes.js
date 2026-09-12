@@ -23,11 +23,15 @@ export const LANES = [
     blurb: 'The recording as captured. The control group.',
     transform: { op: 'none' }
   },
+  // Replaced 2x gain on 12 Sep. Screened on the 20 real recordings using only
+  // unlabelled measures (no accuracy): gain changed the transcript on 1/20 - it only
+  // ever diverged on synthesised speech, by clipping it. Noise changed 12/20 and never
+  // switched the output to Devanagari (untouched audio did on 2/20).
   {
-    id: 'loud',
-    name: 'Amplified',
-    blurb: '2x gain, clipped. Lifts quiet consonants.',
-    transform: { op: 'gain', arg: 2.0 }
+    id: 'noisy',
+    name: 'Noised',
+    blurb: 'Faint white noise, -46 dB. Nudges the model, never drowns the voice.',
+    transform: { op: 'noise', arg: 0.005 }
   },
   {
     id: 'shifted',

@@ -44,7 +44,17 @@ export const normalize = (samples, target = 0.9) => {
   return gain(samples, target / peak);
 };
 
-const TRANSFORMS = { gain, pad, stretch, normalize };
+// Faint white noise. Re-seeded on every call so the same clip always gets the same
+// noise: the API is deterministic, and a fresh random seed would make runs unrepeatable.
+export const noise = (samples, amp) => {
+  let seed = 0x5eed;
+  const rnd = () => ((seed = (Math.imul(seed, 1103515245) + 12345) & 0x7fffffff) / 0x7fffffff) * 2 - 1;
+  const out = new Float32Array(samples.length);
+  for (let i = 0; i < samples.length; i++) out[i] = Math.max(-1, Math.min(1, samples[i] + rnd() * amp));
+  return out;
+};
+
+const TRANSFORMS = { gain, pad, stretch, normalize, noise };
 
 // Apply a lane's transform to a WAV buffer and hand back a new WAV buffer.
 export function applyTransform(wav, transform) {
