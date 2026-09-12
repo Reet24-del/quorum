@@ -76,5 +76,125 @@
     "voice": "Daniel",
     "synthetic": true,
     "hard": true
+  },
+  {
+    "file": "13.wav",
+    "truth": "ask Saoirse to check the kustomize overlay on etcd",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:38:05.903Z"
+  },
+  {
+    "file": "14.wav",
+    "truth": "tell Siobhan the Grafana Loki shards are backing up",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:38:12.928Z"
+  },
+  {
+    "file": "15.wav",
+    "truth": "Tadhg wants the Istio sidecar pinned before Thursday",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:38:20.529Z"
+  },
+  {
+    "file": "16.wav",
+    "truth": "ping Oluwaseun about the ClickHouse migration",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:38:27.364Z"
+  },
+  {
+    "file": "17.wav",
+    "truth": "Xiomara flagged a regression in the Kubeflow pipeline",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:38:33.765Z"
+  },
+  {
+    "file": "18.wav",
+    "truth": "push the kubectl config to staging and tell Priya",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:38:40.448Z"
+  },
+  {
+    "file": "19.wav",
+    "truth": "can Aanya rebase the Terraform branch before the Vercel deploy",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:38:46.466Z"
+  },
+  {
+    "file": "20.wav",
+    "truth": "the Supabase webhook keeps returning a JWT error",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:38:52.562Z"
+  },
+  {
+    "file": "21.wav",
+    "truth": "roll back nginx on the Toronto cluster and ping Rahul",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:00.050Z"
+  },
+  {
+    "file": "22.wav",
+    "truth": "Marcus thinks the gRPC endpoint needs an OAuth refresh",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:06.680Z"
+  },
+  {
+    "file": "23.wav",
+    "truth": "Yuki said the Redis eviction policy is still idempotent",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:14.867Z"
+  },
+  {
+    "file": "24.wav",
+    "truth": "schedule a sync with Ines about the AssemblyAI integration",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:21.931Z"
+  },
+  {
+    "file": "25.wav",
+    "truth": "Reet will demo Quorum to the judges on Saturday",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:27.095Z"
+  },
+  {
+    "file": "26.wav",
+    "truth": "Bhavesh moved the Prometheus alerts into PagerDuty",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:33.429Z"
+  },
+  {
+    "file": "27.wav",
+    "truth": "Aoife found a memory leak in the Rust tokio runtime",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:38.911Z"
+  },
+  {
+    "file": "28.wav",
+    "truth": "send Kwame the Figma link and the Linear ticket",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:44.263Z"
+  },
+  {
+    "file": "29.wav",
+    "truth": "Dmitri says the Kafka consumer lag is over ten thousand",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:50.131Z"
+  },
+  {
+    "file": "30.wav",
+    "truth": "Nairobi and Lisbon both reported the Postgres failover",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:39:55.961Z"
+  },
+  {
+    "file": "31.wav",
+    "truth": "Siddharth wants the Datadog monitors muted until Monday",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:40:01.479Z"
+  },
+  {
+    "file": "32.wav",
+    "truth": "ask Saoirse to check the kustomize overlay on etcd",
+    "synthetic": false,
+    "recorded": "2026-09-12T10:40:07.577Z"
   }
 ]
