@@ -412,3 +412,11 @@ it's the mechanism working.
 **Form.** 2px corner radius throughout — squared-off reads as instrument, rounded reads as
 app. Structure comes from hairline rules, not boxes; the merged transcript sits on the
 ground with no card around it, because a border would compete with it.
+
+**Site.** The landing page (`/`) opens on the real Saoirse/Sirsha capture: the one
+moment that explains the product without words. The only motion is a single
+read-through of the lanes, the losing words being struck out, and the winning words
+underlined. The final state is also the resting state, so reduced-motion users and
+screenshots see the finished page. The results chart is drawn to scale (0–40%) and only
+the Quorum bar is brass. The warm glow behind the hero is the one piece of pure
+atmosphere. `body { overflow-x: clip }` keeps it from making the page scroll sideways.

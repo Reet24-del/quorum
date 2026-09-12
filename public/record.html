@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:wght@400;500;600;700&family=Spectral:ital,wght@0,300;0,400;1,400&display=swap">
+<link rel="stylesheet" href="/site.css">
 <style>
   /* Same tokens as index.html (docs/design.md 11). Brass is reserved for the vote's
      decision, so it does not appear on this page at all. */
@@ -19,9 +20,9 @@
   body {
     margin: 0; background: var(--ground); color: var(--ink);
     font: 15px/1.6 Karla, ui-sans-serif, system-ui, sans-serif;
-    padding: 64px 28px 120px; -webkit-font-smoothing: antialiased;
+    padding: 0 0 120px; -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 720px; margin: 0 auto; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 64px 28px 0; }
   h1 {
     font: 300 36px/1.1 Spectral, Georgia, serif; letter-spacing: -0.02em; margin: 0 0 10px;
   }
@@ -85,13 +86,25 @@
 </style>
 </head>
 <body>
+<nav class="nav" aria-label="Main">
+  <div class="nav-inner">
+    <a class="brand" href="/" aria-label="Quorum home">
+      <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><g fill="none" stroke="#756554" stroke-width="1.4" stroke-linecap="round"><path d="M1 2C8 2 10 8 20 8"/><path d="M1 6C8 6 10 8 20 8"/><path d="M1 10C8 10 10 8 20 8"/><path d="M1 14C8 14 10 8 20 8"/></g><circle cx="20.2" cy="8" r="1.7" fill="#E3A44A"/></svg>
+      Quorum
+    </a>
+    <a class="link" href="/#how">How it works</a>
+    <a class="link" href="/#results">Results</a>
+    <a class="link" href="/record" aria-current="page">Record</a>
+    <a class="link" href="https://github.com/Reet24-del/quorum">GitHub</a>
+    <a class="btn btn-primary btn-sm" href="/try">Try it</a>
+  </div>
+</nav>
 <div class="wrap">
   <h1>Record the eval set</h1>
   <p class="lede">
     Read the sentence aloud the way you'd dictate it: normal pace, no careful enunciation.
     Each take is saved straight into <b>eval/clips/</b> with the sentence as its answer
     key. Run <b>npm run eval:real</b> when you have about twenty.
-    <a href="/">Back to the demo</a>
   </p>
 
   <label for="truth">Say exactly this</label>

@@ -77,7 +77,7 @@ let lastWav = null;
 async function send(wav) {
   lastWav = wav;
   replayBtn.hidden = false;
-  out.innerHTML = '<section><div class="idle">Asking three times…</div></section>';
+  out.innerHTML = '<section><div class="idle">Sending it to every lane…</div></section>';
   let res, data;
   try {
     res = await fetch('/api/transcribe', {
@@ -195,7 +195,8 @@ fetch('/api/lanes').then((r) => r.json()).then((d) => {
   const n = d.lanes?.length || 0;
   if (n) tag.textContent = `One recording, heard ${WORDS[n] || n + ' ways'}. Keep the best words.`;
   if (d.mock) {
-    modeBadge.textContent = 'mock data';
+    modeBadge.textContent = 'sample mode';
+    document.getElementById('mockNote').hidden = false;
     modeBadge.hidden = false;
     // Mock ignores the audio, so seed a clip and let the whole view be
     // exercised with no microphone at all.

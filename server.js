@@ -48,7 +48,9 @@ function readBody(req, limit = 45 * 1024 * 1024) {
 }
 
 async function serveStatic(req, res) {
-  const rel = req.url === '/' ? 'index.html' : decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '');
+  const urlPath = decodeURIComponent(req.url.split('?')[0]);
+  let rel = urlPath === '/' ? 'index.html' : urlPath.replace(/^\/+/, '');
+  if (!path.extname(rel)) rel += '.html'; // pretty URLs: /try -> try.html, /record -> record.html
   const file = path.join(PUBLIC, rel);
   if (!file.startsWith(PUBLIC)) return json(res, 403, { error: 'nope' });
   try {
@@ -152,8 +154,10 @@ server.on('error', (err) => {
   throw err;
 });
 
-server.listen(PORT, () => {
-  console.log(`\n  Quorum listening on http://localhost:${PORT}`);
+// Loopback only. Live mode holds an API key, and /api/eval-clip writes files - neither
+// should be reachable by anything else on the network.
+server.listen(PORT, '127.0.0.1', () => {
+  console.log(`\n  Quorum listening on http://localhost:${PORT}  (demo at /try, recorder at /record)`);
   console.log(`  mode: ${MOCK ? 'MOCK (no API key needed)' : 'LIVE'}`);
   if (!MOCK && !process.env.ASSEMBLYAI_API_KEY) {
     console.log('  warning: ASSEMBLYAI_API_KEY is not set - run `npm run mock` instead\n');

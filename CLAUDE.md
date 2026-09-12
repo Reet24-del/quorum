@@ -25,7 +25,7 @@ clone needs `gh auth login` and those two settings again.
 ```bash
 npm test                      # all four suites; each is a plain node script
 node test/align.test.js       # run one suite - any file in test/ runs standalone
-npm run mock                  # server on :5173 with canned lanes, no API key needed
+npm run mock                  # server on :5173 with canned lanes, no API key needed (/try shows a sample-mode warning)
 npm start                     # live server, needs ASSEMBLYAI_API_KEY
 npm run probe                 # interrogates the live endpoint; run before trusting any API assumption
 npm run eval                  # WER table from eval/clips/ + eval/manifest.json
@@ -55,6 +55,12 @@ public/app.js  --raw WAV-->  server.js  --transformed copy per lane-->  Assembly
   comes back with an `error` field and no vote. Only if every lane fails does the call
   throw. The server passes `votingLaneIds` because the merge's candidate indices refer to
   the voting lanes, not all lanes. The UI relies on that mapping.
+- Pages: `/` landing (`public/index.html`), `/try` live demo (`try.html` + `app.js`),
+  `/record` recorder (`record.html` + `record.js`). `server.js` maps extensionless paths
+  to `.html` and **binds 127.0.0.1 only**: live mode holds the API key and
+  `/api/eval-clip` writes files. Tokens, nav, buttons and footer are in
+  `public/site.css`. The nav markup is copied into each page (there's no build step), so
+  change all three when you change it.
 - `public/wav.js` is imported by the browser (`app.js`) and by Node (`src/audio.js`,
   tests), so it must stay environment-neutral: no DOM, no Node `Buffer` APIs.
 - `src/script.js` `guardScript()` runs before every merge, **in both `server.js` and
@@ -134,7 +140,7 @@ These override the public docs. They are also recorded in the header of `src/ass
   (which can't be tested headlessly) stays untouched.
 - `test/wav.test.js` reads `eval/clips/01.wav` and skips those assertions if the file is
   missing.
-- `index.html` and `app.js` share a set of CSS class names (`.fixed`, `.won`, `.lost`,
+- `try.html` and `app.js` share a set of CSS class names (`.fixed`, `.won`, `.lost`,
   `.dropped`, `.opt`, `.timing`, …). Renaming one means updating both files.
 
 ## Docs and their state

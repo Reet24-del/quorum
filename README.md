@@ -98,7 +98,9 @@ Node 18+, no dependencies.
 npm run mock           # full interface on canned (real, captured) responses, no key needed
 ```
 
-Open http://localhost:5173, then hold the button or the spacebar, talk, and let go.
+Open http://localhost:5173 for the landing page. The live demo is at **/try**: hold the
+button or the space bar, talk, and let go. Without a key it runs in *sample mode* and
+returns one captured example whatever you say; the demo page says so in red.
 
 ```bash
 export ASSEMBLYAI_API_KEY=your_key_here
@@ -109,7 +111,7 @@ npm run eval           # WER table from eval/clips/ + eval/manifest.json
 npm run eval:real      # the same, on your real recordings only
 ```
 
-**Record the eval set in your own voice** at http://localhost:5173/record.html. It gives
+**Record the eval set in your own voice** at http://localhost:5173/record. It gives
 you a sentence to read; hold space, say it, let go, and it's saved straight into
 `eval/clips/` with the sentence as its answer key. About twenty takes, then
 `npm run eval:real`.
@@ -159,7 +161,10 @@ src/mock.js         a real capture from the live API, for offline demos
 server.js           local server; the only thing that holds the API key
 probe.js            endpoint reconnaissance
 eval.js             the accuracy harness
-public/             push-to-talk capture and results view
+public/index.html   landing page
+public/try.html     the live demo (with app.js)
+public/record.html  the eval recorder (with record.js)
+public/site.css     shared tokens, nav, buttons, footer
 test/               merge, WER, WAV encoding, lane dropout
 docs/               design notes and the original PRD
 ```

@@ -1,0 +1,99 @@
+/* Shared by every page. Visual spec: docs/design.md 11.
+   One rule carries the palette: brass marks what the vote decided, and nothing else. */
+
+:root {
+  --ground:   #15110D;
+  --raise:    #1D1813;
+  --sunk:     #100D09;
+  --ink:      #F2E9DC;
+  --muted:    #A89684;
+  --faint:    #756554;
+  --rule:     #2B2219;
+  --rule-lit: #3A2E22;
+  --brass:    #E3A44A;
+  --brass-dim:#6B4F20;
+  --clay:     #C4705E;
+  --ember:    #E0563F;
+
+  --serif: Spectral, Georgia, "Times New Roman", serif;
+  --sans:  Karla, ui-sans-serif, system-ui, sans-serif;
+  --mono:  "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: 15px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip; /* decorative glows may bleed past the edge; the page must never scroll sideways */
+}
+a { color: inherit; }
+img, svg { max-width: 100%; }
+
+.eyebrow {
+  font: 400 11px/1 var(--mono);
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--faint);
+}
+
+/* ---------------- navigation ---------------- */
+.nav {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(21, 17, 13, .86);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
+}
+.nav-inner {
+  max-width: 1120px; margin: 0 auto; padding: 14px 28px;
+  display: flex; align-items: center; gap: 26px;
+}
+.brand {
+  display: flex; align-items: center; gap: 11px; margin-right: auto;
+  font: 400 21px/1 var(--serif); letter-spacing: -.01em; text-decoration: none;
+}
+.nav .link {
+  font: 500 13.5px var(--sans); color: var(--muted); text-decoration: none;
+  padding: 4px 0; border-bottom: 1px solid transparent;
+}
+.nav .link:hover { color: var(--ink); }
+.nav .link[aria-current="page"] { color: var(--ink); border-bottom-color: var(--rule-lit); }
+
+/* ---------------- buttons ---------------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 13px 22px; border-radius: 2px; text-decoration: none; cursor: pointer;
+  font: 600 13px var(--sans); letter-spacing: .07em; text-transform: uppercase;
+  border: 1px solid transparent; transition: background .15s, border-color .15s, color .15s;
+}
+.btn-primary { background: var(--ink); color: var(--ground); }
+.btn-primary:hover { background: #fff8ec; }
+.btn-ghost { border-color: var(--rule-lit); color: var(--ink); background: transparent; }
+.btn-ghost:hover { border-color: var(--muted); }
+.btn-sm { padding: 8px 15px; font-size: 11.5px; }
+
+a:focus-visible, button:focus-visible, textarea:focus-visible {
+  outline: 1px solid var(--ink); outline-offset: 3px;
+}
+
+/* ---------------- footer ---------------- */
+.foot { border-top: 1px solid var(--rule); margin-top: 120px; }
+.foot-inner {
+  max-width: 1120px; margin: 0 auto; padding: 28px;
+  display: flex; gap: 20px; justify-content: space-between; flex-wrap: wrap;
+  font: 400 12px/1.6 var(--mono); color: var(--faint);
+}
+.foot a { color: var(--muted); text-decoration: none; }
+.foot a:hover { color: var(--ink); }
+
+@media (max-width: 720px) {
+  .nav-inner { gap: 16px; padding: 12px 20px; }
+  .nav .link { display: none; }
+  .nav .link.keep { display: inline; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
