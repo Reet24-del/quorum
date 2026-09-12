@@ -10,7 +10,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:wght@400;500;600;700&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300;1,400&display=swap">
 <link rel="stylesheet" href="/site.css">
 <style>
-  .shell { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  /* clip at the shell: the hero glow fades out before this edge, so nothing visible is cut */
+  .shell { max-width: 1120px; margin: 0 auto; padding: 0 28px; overflow-x: clip; }
   section[id] { scroll-margin-top: 84px; }
 
   /* ================= hero ================= */
@@ -67,9 +68,9 @@
   @keyframes strike { from { transform: scaleX(0); } }
 
   .row .scan {                                   /* a single pass, as if the lane is being read */
-    position: absolute; inset: 0 auto 0 0; width: 40%;
+    position: absolute; inset: 0 auto 0 0; width: 40%; opacity: 0;   /* rests invisible, in bounds */
     background: linear-gradient(90deg, transparent, rgba(242, 233, 220, .05), transparent);
-    animation: scan 1.1s ease-out both; pointer-events: none;
+    animation: scan 1.1s ease-out backwards; pointer-events: none;
   }
   .row:nth-of-type(2) .scan { animation-delay: .05s; }
   .row:nth-of-type(3) .scan { animation-delay: .15s; }
