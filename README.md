@@ -182,6 +182,19 @@ alternatives we rejected are in [docs/design.md](docs/design.md).
 
 ---
 
+## Demo video
+
+`public/reel.html` is the 90-second demo. Every transcript, confidence and timing in it
+comes from real captures (`demo/captures/`), and the voice is the owner's own
+recordings. Preview it with sound at http://localhost:5173/reel. To rebuild the MP4,
+using only Apple frameworks (no ffmpeg, no browser install):
+
+```bash
+node demo/build.mjs
+swiftc -O -swift-version 5 demo/render.swift -o /tmp/render-reel
+/tmp/render-reel video "http://localhost:5173/reel?render=1" public/reel/soundtrack.m4a quorum-demo.mp4
+```
+
 ## Layout
 
 ```

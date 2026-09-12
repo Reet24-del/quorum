@@ -20,7 +20,13 @@ const MOCK = process.env.QUORUM_MOCK === '1';
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8'
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.m4a': 'audio/mp4',
+  '.wav': 'audio/wav',
+  '.mp4': 'video/mp4',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml'
 };
 
 const json = (res, code, body) => {

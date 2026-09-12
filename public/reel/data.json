@@ -1,0 +1,381 @@
+{
+  "duration": 90,
+  "clips": {
+    "c14": {
+      "offset": 25.5,
+      "duration": 4.096,
+      "said": "tell Siobhan the Grafana Loki shards are backing up",
+      "eyebrow": "Live, in my own voice",
+      "caption": "Three lanes out-vote one confident mistake.",
+      "note": null,
+      "envelope": [
+        0,
+        0.095,
+        0.095,
+        0.02,
+        0,
+        0.019,
+        0.09,
+        0.119,
+        0.127,
+        0.123,
+        0.128,
+        0.123,
+        0.12,
+        0.63,
+        0.843,
+        0.869,
+        0.758,
+        0.768,
+        0.374,
+        0.247,
+        0.235,
+        0.262,
+        0.853,
+        0.884,
+        0.85,
+        0.994,
+        0.946,
+        0.736,
+        0.741,
+        0.842,
+        0.955,
+        0.974,
+        1,
+        0.891,
+        0.702,
+        0.725,
+        0.598,
+        0.497,
+        0.727,
+        0.701,
+        0.544,
+        0.452,
+        0.694,
+        0.695,
+        0.667,
+        0.233,
+        0.144,
+        0.556,
+        0.784,
+        0.784,
+        0.696,
+        0.672,
+        0.673,
+        0.741,
+        0.794,
+        0.684,
+        0.705,
+        0.875,
+        0.852,
+        0.695,
+        0.436,
+        0.165,
+        0.218,
+        0.614,
+        0.745,
+        0.608,
+        0.363,
+        0.28,
+        0.265,
+        0.736,
+        0.873,
+        0.908,
+        0.917,
+        0.786,
+        0.656,
+        0.562,
+        0.56,
+        0.681,
+        0.833,
+        0.805,
+        0.798,
+        0.528,
+        0.486,
+        0.502,
+        0.774,
+        0.804,
+        0.597,
+        0.293,
+        0.25,
+        0.447,
+        0.59,
+        0.602,
+        0.626,
+        0.561,
+        0.754,
+        0.665
+      ],
+      "lanes": [
+        {
+          "id": "raw",
+          "name": "Untouched",
+          "text": "Tell CEO Bhan the Grafana Loki shards are backing up.",
+          "satOut": false,
+          "script": "Latin",
+          "dispute": {
+            "phrase": "CEO Bhan",
+            "conf": 0.7,
+            "won": false
+          }
+        },
+        {
+          "id": "noisy",
+          "name": "Faint noise",
+          "text": "Tell Siobhan the Grafana Loki shards are backing up.",
+          "satOut": false,
+          "script": "Latin",
+          "dispute": {
+            "phrase": "Siobhan",
+            "conf": 0.56,
+            "won": true
+          }
+        },
+        {
+          "id": "shifted",
+          "name": "+200 ms silence",
+          "text": "Tell Siobhan the Grafana Loki shards are backing up.",
+          "satOut": false,
+          "script": "Latin",
+          "dispute": {
+            "phrase": "Siobhan",
+            "conf": 0.45,
+            "won": true
+          }
+        },
+        {
+          "id": "slowed",
+          "name": "0.95× speed",
+          "text": "Tell Siobhan the Grafana Loki shards are backing up.",
+          "satOut": false,
+          "script": "Latin",
+          "dispute": {
+            "phrase": "Siobhan",
+            "conf": 0.57,
+            "won": true
+          }
+        }
+      ],
+      "verdict": [
+        {
+          "text": "Tell",
+          "pick": false
+        },
+        {
+          "text": "Siobhan",
+          "pick": true
+        },
+        {
+          "text": "the",
+          "pick": false
+        },
+        {
+          "text": "Grafana",
+          "pick": false
+        },
+        {
+          "text": "Loki",
+          "pick": false
+        },
+        {
+          "text": "shards",
+          "pick": false
+        },
+        {
+          "text": "are",
+          "pick": false
+        },
+        {
+          "text": "backing",
+          "pick": false
+        },
+        {
+          "text": "up.",
+          "pick": false
+        }
+      ],
+      "timing": {
+        "wallMs": 3836,
+        "sumOfLanesMs": 14849
+      }
+    },
+    "c17": {
+      "offset": 44.2,
+      "duration": 4.352,
+      "said": "Xiomara flagged a regression in the Kubeflow pipeline",
+      "eyebrow": "When the model switches language",
+      "caption": "Three lanes answered in Hindi script. Quorum sat them out and kept the English one.",
+      "note": "Not perfect: it heard “Jawmara”. But it is English you can correct.",
+      "envelope": [
+        0,
+        0.092,
+        0.088,
+        0,
+        0,
+        0.034,
+        0.124,
+        0.378,
+        0.38,
+        0.617,
+        0.842,
+        0.969,
+        1,
+        0.939,
+        0.949,
+        0.839,
+        0.992,
+        0.996,
+        0.93,
+        0.882,
+        0.912,
+        0.716,
+        0.736,
+        0.786,
+        0.683,
+        0.407,
+        0.144,
+        0.134,
+        0.616,
+        0.757,
+        0.86,
+        0.815,
+        0.659,
+        0.461,
+        0.382,
+        0.465,
+        0.665,
+        0.7,
+        0.503,
+        0.702,
+        0.595,
+        0.368,
+        0.578,
+        0.615,
+        0.67,
+        0.584,
+        0.321,
+        0.302,
+        0.401,
+        0.522,
+        0.506,
+        0.357,
+        0.402,
+        0.551,
+        0.57,
+        0.569,
+        0.513,
+        0.558,
+        0.588,
+        0.301,
+        0.145,
+        0.174,
+        0.26,
+        0.663,
+        0.65,
+        0.742,
+        0.494,
+        0.302,
+        0.084,
+        0.12,
+        0.133,
+        0.09,
+        0.381,
+        0.485,
+        0.614,
+        0.613,
+        0.571,
+        0.435,
+        0.099,
+        0.085,
+        0.64,
+        0.706,
+        0.659,
+        0.54,
+        0.32,
+        0.133,
+        0.412,
+        0.568,
+        0.499,
+        0.41,
+        0.36,
+        0.286,
+        0.265,
+        0.205,
+        0.107,
+        0.087
+      ],
+      "lanes": [
+        {
+          "id": "raw",
+          "name": "Untouched",
+          "text": "जाओ मारा फ्लैग डी रिग्रेशन इन डी क्यूब फ्लो पाइपलाइन।",
+          "satOut": true,
+          "script": "Devanagari",
+          "dispute": null
+        },
+        {
+          "id": "noisy",
+          "name": "Faint noise",
+          "text": "Jawmara flagged a regression in the Kubeflow pipeline.",
+          "satOut": false,
+          "script": "Latin",
+          "dispute": null
+        },
+        {
+          "id": "shifted",
+          "name": "+200 ms silence",
+          "text": "जाओ मारा फ्लैग द रिग्रेशन इन द क्यूब फ्लो पाइपलाइन।",
+          "satOut": true,
+          "script": "Devanagari",
+          "dispute": null
+        },
+        {
+          "id": "slowed",
+          "name": "0.95× speed",
+          "text": "जाओ मारा फ्लैग डी रिग्रेशन इन द क्यूब फ्लो पाइपलाइन।",
+          "satOut": true,
+          "script": "Devanagari",
+          "dispute": null
+        }
+      ],
+      "verdict": [
+        {
+          "text": "Jawmara",
+          "pick": false
+        },
+        {
+          "text": "flagged",
+          "pick": false
+        },
+        {
+          "text": "a",
+          "pick": false
+        },
+        {
+          "text": "regression",
+          "pick": false
+        },
+        {
+          "text": "in",
+          "pick": false
+        },
+        {
+          "text": "the",
+          "pick": false
+        },
+        {
+          "text": "Kubeflow",
+          "pick": false
+        },
+        {
+          "text": "pipeline.",
+          "pick": false
+        }
+      ],
+      "timing": {
+        "wallMs": 1967,
+        "sumOfLanesMs": 6933
+      }
+    }
+  }
+}

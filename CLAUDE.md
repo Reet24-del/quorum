@@ -154,6 +154,12 @@ These override the public docs. They are also recorded in the header of `src/ass
 - `try.html` and `app.js` share a set of CSS class names (`.fixed`, `.won`, `.lost`,
   `.dropped`, `.opt`, `.timing`, …). Renaming one means updating both files.
 
+- `public/reel.html` (the demo video) must move **only through `renderAt(t)`**: no CSS
+  animations, transitions or timers. `demo/render.swift` renders it frame by frame in a
+  hidden WebKit view, so anything that runs on real time would drift or freeze.
+  Transcripts come from `demo/captures/*.json`, never typed in by hand. Rebuild the
+  data and soundtrack with `node demo/build.mjs`.
+
 ## Docs and their state
 
 - `docs/design.md` §11 is the **visual spec**: warm dark palette, brass (`#E3A44A`)
