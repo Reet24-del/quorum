@@ -47,9 +47,10 @@ public/app.js  --raw WAV-->  server.js  --transformed copy per lane-->  Assembly
 ```
 
 - `src/lanes.js` defines the lanes. Each lane has a `transform` (`none`, `normalize`,
-  `pad`, `stretch`, `gain`) applied by `src/audio.js` to the WAV before upload. The lanes
-  are the demo's main tuning knob.
-- `src/assembly.js` handles fan-out and lane dropout. A lane that errors or times out (8s)
+  `pad`, `stretch`, `gain`) applied by `src/audio.js` to the WAV before upload. It also
+  exports `VOCABULARY`, which the server passes to `merge()`. Lanes and vocabulary are
+  the demo's main tuning knobs.
+- `src/assembly.js` handles fan-out and lane dropout. A lane that errors or times out (20s; calls measured up to about 7s, and 8s was dropping whole clips)
   comes back with an `error` field and no vote. Only if every lane fails does the call
   throw. The server passes `votingLaneIds` because the merge's candidate indices refer to
   the voting lanes, not all lanes. The UI relies on that mapping.
@@ -76,6 +77,12 @@ Invariants you won't see from reading one function:
   the first-seen form reintroduces a bug that lost real eval cases.
 - A lone lane beats a group of `k` when `c_solo − c_group > α(k−1)/((1−α)L)`. Adding lanes
   makes it *harder* for a correct outlier to win. Don't add lanes without adjusting `α`.
+- `opts.vocabulary` adds `vocabBonus` (0.3) to a **dispute** ballot whose phrase is a
+  known term (`isKnown`). It only chooses between spellings some lane produced. It never
+  inserts a word and never touches anchors. Keep it that way: that constraint is why
+  it can't hallucinate names. `VOCABULARY` was written before eval clips 07–12 and
+  deliberately leaves out their answers. Don't add those answers to it, because that
+  would tune the eval to its own test set.
 
 ## Facts about the live API (probed 12 Sep 2026)
 
@@ -113,6 +120,9 @@ These override the public docs. They are also recorded in the header of `src/ass
 - `docs/design.md` §11 is the **visual spec**: warm dark palette, brass (`#E3A44A`)
   reserved for words the vote decided, Spectral for transcripts, Karla for UI, IBM Plex
   Mono for measurements. Update it before changing how the page looks.
+- `README.md` is current: it pitches the audio-variation finding and reports eval
+  numbers honestly, including where the merge loses. Update its results table when the
+  eval changes.
 - **Out of date:** `docs/prd.html` and `docs/design.md` §1–5 and §7 still describe
   vocabulary hints as the mechanism. The failure-modes, testing, file-map and visual
   sections are current. Check the code before relying on the stale sections.
