@@ -4,18 +4,25 @@ Technical design for the merge. The PRD covers *what* and *why*; this covers *ho
 and records the decisions that were live options at the time so they don't get
 relitigated at 2am on Saturday.
 
+> **Updated 12 Sep 2026, after probing the live API.** The original premise, one
+> vocabulary hint per lane, didn't survive contact with the endpoint: the beta accepts
+> hint fields and ignores them. Lanes now vary the *audio*, and vocabulary became a
+> merge-time tie-breaker. The sections below reflect that. §7.7 records the reversal.
+
 ---
 
 ## 1. Overview
 
 One clip of audio goes to the AssemblyAI Dictation endpoint **N times concurrently**,
-each request carrying a different vocabulary hint. The responses disagree. Quorum
+each copy transformed differently (gain, padding, speed). The responses disagree. Quorum
 aligns them, finds the spans where they disagree, and settles each span by a vote
 weighted on per-word confidence.
 
-The whole design rests on one property of the endpoint: at ~134 ms, a transcription
-is cheap enough to be called redundantly. Nothing here works on an API that takes a
-second.
+The design rests on two measured properties of the endpoint. It is **deterministic**:
+identical audio returns an identical transcript and identical confidences, so any
+disagreement between lanes is caused by the transform. And its output **changes under
+audio transforms a listener can't hear.** Calls take 1.5–3.5s, not the documented
+134ms, but they parallelise: four lanes cost about 1.3× one call.
 
 ---
 
@@ -33,10 +40,11 @@ WAV encode (PCM S16LE)
   │  body: raw WAV bytes
   ▼
                         server.js
-                             │  fan out, Promise.all
-                             ├──────────────────────────────▶ lane: cold
-                             ├──────────────────────────────▶ lane: code
-                             └──────────────────────────────▶ lane: people
+                             │  transform + fan out, Promise.allSettled
+                             ├──────────────────────────────▶ lane: raw
+                             ├──────────────────────────────▶ lane: loud     (2x gain)
+                             ├──────────────────────────────▶ lane: shifted  (200ms pad)
+                             └──────────────────────────────▶ lane: slowed   (0.95x)
                                                                   │
                              ┌────────────────────────────────────┘
                              ▼
@@ -45,7 +53,7 @@ WAV encode (PCM S16LE)
   ◀──────────────────────────┘
   │  { lanes[], merged, timing }
   ▼
-render three lanes + merged
+render every lane + merged
 ```
 
 **Why a local server at all.** The API key cannot ship to the browser. The server is
@@ -81,8 +89,8 @@ occupying the same moment are almost certainly the same slot even when the text 
 wildly (`cube` vs `kubectl`). Text is weighted higher because word *boundaries* shift
 exactly where lanes disagree — which is why timing alone is not enough (see §7.6).
 
-If a response has no timings, `timeSim` returns a constant 0.5 and alignment falls back
-to text similarity. It still works; it gets worse on repeated words.
+The live beta returns **no timings**, so `merge()` detects that (`hasTimings`) and aligns
+on spelling alone (`wText = 1, wTime = 0`). It still works; it gets worse on repeated words.
 
 **Alignment** is Needleman–Wunsch, gap penalty −0.5.
 
@@ -173,6 +181,7 @@ All in `DEFAULTS` in `src/align.js`, all overridable per call.
 | `wTime` | 0.35 | alignment: weight on time overlap. Set to 0 if the API returns no timings. |
 | `gapPenalty` | −0.50 | alignment: cost of an unmatched word. Less negative → more gaps, more columns. |
 | `laneWeights` | all 1 | per-lane confidence multiplier. The hook for calibration (§6). |
+| `vocabBonus` | 0.30 | added to a dispute ballot whose phrase is in `opts.vocabulary`. Enough for one lane with a known spelling to overrule a 3–1 majority at equal confidence. |
 
 ---
 
@@ -187,16 +196,20 @@ X-AAI-Model: universal-3-5-pro
 multipart: audio = WAV or PCM S16LE, 16kHz, 80ms–2min, ≤40MB
 ```
 
-**Not confirmed:** the parameter names for the vocabulary hints. `src/assembly.js`
-isolates them in one constant:
+**Measured on 12 Sep 2026** (`npm run probe`, then transcript comparisons):
 
-```js
-const HINT_FIELDS = { keyterms: 'keyterms', prompt: 'prompt' };
-```
+- Per-word `text` and `confidence` are returned. **No per-word timings** are returned;
+  `merge()` detects this and aligns on text alone.
+- `keyterms`, `prompt`, `word_boost`, `keywords` and invented field names all return
+  200 and are **ignored**. On clips where the model mishears exactly the hinted term,
+  output is byte-identical with and without the hint. Status codes proved nothing here;
+  comparing transcripts did.
+- The API is **deterministic**: same audio three times gives the same text and the same
+  confidence vector, on three clips.
+- Latency is 1.5–3.5s typical, ~7s at the tail. Responses carry `llm_response`, which
+  suggests an LLM pass. The per-lane timeout is 20s.
 
-Overridable by env (`QUORUM_KEYTERM_FIELD`, `QUORUM_PROMPT_FIELD`) so the probe can find
-the right names without a code change. Candidates if these are rejected:
-`keyterms_prompt`, `word_boost`, `keywords`.
+Hint sending is kept behind `QUORUM_SEND_HINTS=1` in case the beta starts honouring it.
 
 **Response parsing is defensive by design** — `parseWords()` accepts `words` or
 `utterances`, `text`/`word`, `confidence`/`conf`, and detects milliseconds by checking
@@ -242,14 +255,22 @@ against. It also needs labelled training data we don't have.
 quota, kills the demo — the parallelism is the visible idea. Worse, "confident but
 wrong" is the exact failure mode being corrected.
 
-**7.5 Audio-variation lanes as the primary axis.** Kept as the fallback (§6), not the
-headline, because vocabulary hints have a published WER figure to point at and audio
-jitter does not.
+**7.5 Audio-variation lanes as the primary axis.** Originally kept as the fallback,
+because vocabulary hints had a published WER figure behind them and audio jitter didn't.
+Reversed on 12 Sep, see §7.7.
 
 **7.6 Timing-only alignment.** Tempting given all lanes share a clock, but word
 boundaries diverge precisely where lanes disagree — `kubectl` spans two words' worth of
 time. Timing alone misaligns exactly where alignment matters most. Hence the 0.65/0.35
 blend favouring text.
+
+**7.7 Vocabulary hints through the API. Adopted, then reversed.** This was the original
+headline mechanism: three lanes, three vocabularies. The probe showed the beta ignores
+every hint field, so the lanes would have returned three identical transcripts and there
+would have been nothing to vote on. Audio variation replaced it. On the hard clip it
+produced four distinct transcripts from five variants, and three of them recovered a
+name the untouched audio got wrong. Vocabulary survives in a narrower role: a
+merge-time tie-breaker that can only choose among spellings a lane actually heard.
 
 ---
 

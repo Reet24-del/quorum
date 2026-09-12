@@ -123,9 +123,11 @@ These override the public docs. They are also recorded in the header of `src/ass
 - `README.md` is current: it pitches the audio-variation finding and reports eval
   numbers honestly, including where the merge loses. Update its results table when the
   eval changes.
-- **Out of date:** `docs/prd.html` and `docs/design.md` §1–5 and §7 still describe
-  vocabulary hints as the mechanism. The failure-modes, testing, file-map and visual
-  sections are current. Check the code before relying on the stale sections.
+- `docs/design.md` is current as of 12 Sep. The probe findings are folded in, and §7.7
+  records why the mechanism changed.
+- `docs/prd.html` is the **original plan**, kept as written, with a dated notice at the
+  top listing what the probe overturned. Its body still describes vocabulary lanes.
+  That's deliberate, as a record. For the current design, use the README.
 - The PRD is also published at
   https://claude.ai/code/artifact/e8480306-5496-4508-b35c-262eaa28a172. It moved into
   `docs/`, so republishing requires passing that URL, not just the file path.
