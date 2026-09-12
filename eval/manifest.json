@@ -34,5 +34,47 @@
     "truth": "the gRPC endpoint needs an OAuth token from Aanya",
     "voice": "Alex",
     "synthetic": true
+  },
+  {
+    "file": "07.wav",
+    "truth": "ask Saoirse to check the kustomize overlay on etcd",
+    "voice": "Daniel",
+    "synthetic": true,
+    "hard": true
+  },
+  {
+    "file": "08.wav",
+    "truth": "Ngozi says the Zalando postgres operator is flaking in ArgoCD",
+    "voice": "Daniel",
+    "synthetic": true,
+    "hard": true
+  },
+  {
+    "file": "09.wav",
+    "truth": "tell Siobhan the Grafana Loki shards are backing up",
+    "voice": "Samantha",
+    "synthetic": true,
+    "hard": true
+  },
+  {
+    "file": "10.wav",
+    "truth": "Tadhg wants the Istio sidecar pinned before Thursday",
+    "voice": "Daniel",
+    "synthetic": true,
+    "hard": true
+  },
+  {
+    "file": "11.wav",
+    "truth": "ping Oluwaseun about the ClickHouse migration",
+    "voice": "Samantha",
+    "synthetic": true,
+    "hard": true
+  },
+  {
+    "file": "12.wav",
+    "truth": "Xiomara flagged a regression in the Kubeflow pipeline",
+    "voice": "Daniel",
+    "synthetic": true,
+    "hard": true
   }
 ]

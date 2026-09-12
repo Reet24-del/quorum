@@ -25,9 +25,9 @@ export const LANES = [
   },
   {
     id: 'loud',
-    name: 'Normalised',
-    blurb: 'Peak-normalised to 0.9. Recovers quiet consonants.',
-    transform: { op: 'normalize', arg: 0.9 }
+    name: 'Amplified',
+    blurb: '2x gain, clipped. Lifts quiet consonants.',
+    transform: { op: 'gain', arg: 2.0 }
   },
   {
     id: 'shifted',
