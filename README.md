@@ -128,6 +128,39 @@ vocabulary. Put the names you'll actually say into `VOCABULARY`.
 
 ---
 
+## Use it as a drop-in API
+
+Already calling AssemblyAI's Dictation endpoint? Point the same request at Quorum.
+Keep the same `audio` form field and the same headers, and change only the URL:
+
+```bash
+curl http://localhost:5173/transcribe \
+  -H "Authorization: $ASSEMBLYAI_API_KEY" \
+  -H "X-AAI-Model: universal-3-5-pro" \
+  -F "audio=@clip.wav;type=audio/wav"
+```
+
+The same command against both hosts, on a real recording of "tell Siobhan the Grafana
+Loki shards are backing up":
+
+```
+dictation.assemblyai.com   Tell CEO Bhan the Grafana Loki shards are backing up.
+localhost:5173 (Quorum)    Tell Siobhan the Grafana Loki shards are backing up.
+```
+
+The response has the API's own shape (`text`, `words` with per-word `confidence`,
+`confidence`, `audio_duration_ms`), so an existing client needs no other change. It
+also carries an extra `quorum` block, with every lane's transcript, whether it voted,
+the number of disputes and the timing, which a client can use or ignore.
+
+**Your `Authorization` header is passed through** as the key for all four lane calls,
+so each caller pays for their own usage; the server's key is only a fallback. Raw PCM
+bodies (no WAV header, 16 kHz mono assumed) are accepted too, as the API accepts them.
+
+Keep `;type=audio/wav` on the `-F`. AssemblyAI rejects an audio part labelled
+`application/octet-stream`, which is curl's default, with **415 Unsupported Media Type**.
+Quorum accepts either label, but the command above is the one that works against both.
+
 ## How the merge works
 
 All in `src/align.js`:

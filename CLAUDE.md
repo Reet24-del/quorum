@@ -31,6 +31,7 @@ npm run probe                 # interrogates the live endpoint; run before trust
 npm run eval                  # WER table from eval/clips/ + eval/manifest.json
 QUORUM_MOCK=1 node eval.js    # exercises the eval harness without spending API calls
 npm run eval:real             # only real recordings (QUORUM_EVAL_SET=real) - the number worth quoting
+curl localhost:5173/transcribe -H "Authorization: $KEY" -F "audio=@clip.wav;type=audio/wav"   # the drop-in endpoint
 ```
 
 There is no test framework. Each test file prints PASS/FAIL lines and exits non-zero on
@@ -55,6 +56,13 @@ public/app.js  --raw WAV-->  server.js  --transformed copy per lane-->  Assembly
   comes back with an `error` field and no vote. Only if every lane fails does the call
   throw. The server passes `votingLaneIds` because the merge's candidate indices refer to
   the voting lanes, not all lanes. The UI relies on that mapping.
+- `src/quorum.js` `runQuorum()` is the single pipeline (fan-out, `guardScript`, merge)
+  behind both `POST /api/transcribe` (the demo UI's shape) and `POST /transcribe` (the
+  **drop-in**: AssemblyAI's own request and response shape, via `toAssemblyShape()`;
+  `src/multipart.js` parses the `audio` part). The drop-in uses the **caller's**
+  `Authorization` header as the AssemblyAI key, with the env key as fallback. Don't
+  break the response shape: `test/dropin.test.js` spawns the real server against a
+  stub and pins it.
 - Pages: `/` landing (`public/index.html`), `/try` live demo (`try.html` + `app.js`),
   `/record` recorder (`record.html` + `record.js`). `server.js` maps extensionless paths
   to `.html` and **binds 127.0.0.1 only**: live mode holds the API key and
@@ -63,7 +71,7 @@ public/app.js  --raw WAV-->  server.js  --transformed copy per lane-->  Assembly
   change all three when you change it.
 - `public/wav.js` is imported by the browser (`app.js`) and by Node (`src/audio.js`,
   tests), so it must stay environment-neutral: no DOM, no Node `Buffer` APIs.
-- `src/script.js` `guardScript()` runs before every merge, **in both `server.js` and
+- `src/script.js` `guardScript()` runs before every merge, **in both `src/quorum.js` and
   `eval.js`**. Failed lanes and lanes whose output is in the wrong script (default Latin)
   don't vote. The two call sites once drifted apart (the eval let failed lanes vote), so
   keep them on the same rule.
@@ -105,6 +113,9 @@ These override the public docs. They are also recorded in the header of `src/ass
   parameter, compare transcripts, not status codes. This finding is why lanes transform
   audio instead of passing vocabulary.
 - It returns per-word `text` and `confidence` but **no timings**.
+- It rejects a multipart audio part that isn't labelled `audio/wav` with **415**. curl's
+  `-F` defaults to `application/octet-stream`, so docs must show `;type=audio/wav`.
+  Quorum's drop-in accepts either label.
 - **The output language can't be pinned.** `language_code`, `language`,
   `language_detection`, an `X-AAI-Language` header and `?language_code=` are all ignored.
   On an accented voice the model sometimes answers in **Devanagari**, spelling English

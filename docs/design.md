@@ -420,3 +420,22 @@ underlined. The final state is also the resting state, so reduced-motion users a
 screenshots see the finished page. The results chart is drawn to scale (0–40%) and only
 the Quorum bar is brass. The warm glow behind the hero is the one piece of pure
 atmosphere. `body { overflow-x: clip }` keeps it from making the page scroll sideways.
+
+---
+
+## 12. Drop-in API
+
+`POST /transcribe` accepts exactly what AssemblyAI's Dictation endpoint accepts: a
+multipart `audio` part (or a raw WAV/PCM body) with `Authorization` and `X-AAI-Model`
+headers. It answers in the same shape: `text`, `words[{text, confidence}]`,
+`confidence`, `audio_duration_ms`. A client moves from AssemblyAI to Quorum by changing
+its base URL and nothing else.
+
+A dispute's winning phrase is split into words, and each word carries the winning
+ballot's mean confidence. An agreed word carries the mean across lanes. An extra
+`quorum` block (lanes, who voted, disputes, timing) rides along for clients that want it.
+
+The caller's `Authorization` header is forwarded as the key for all four lane calls.
+That keeps billing with the caller, and it's the prerequisite for ever hosting this
+publicly: a public endpoint holding the owner's key would let anyone spend their
+credits.

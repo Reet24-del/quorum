@@ -61,15 +61,16 @@ export function parseWords(json) {
   return words;
 }
 
-export async function transcribeLane(wav, lane, { timeoutMs = 20000 } = {}) {
-  const key = process.env.ASSEMBLYAI_API_KEY;
-  if (!key) throw new MissingKey('ASSEMBLYAI_API_KEY is not set');
+export async function transcribeLane(wav, lane, { timeoutMs = 20000, key: callerKey, model: callerModel } = {}) {
+  // A caller's own key wins, so the drop-in /transcribe bills whoever calls it.
+  const key = callerKey || process.env.ASSEMBLYAI_API_KEY;
+  if (!key) throw new MissingKey('No AssemblyAI key: send an Authorization header or set ASSEMBLYAI_API_KEY');
 
   const started = Date.now();
   const audio = applyTransform(wav, lane.transform);
   const res = await fetch(endpoint(), {
     method: 'POST',
-    headers: { Authorization: key, 'X-AAI-Model': model() },
+    headers: { Authorization: key, 'X-AAI-Model': callerModel || model() },
     body: buildForm(audio, lane),
     signal: AbortSignal.timeout(timeoutMs)
   });
@@ -106,10 +107,10 @@ export async function transcribeLane(wav, lane, { timeoutMs = 20000 } = {}) {
 //
 // A lane that errors or times out does not fail the request - it drops out and the
 // merge runs on whoever came back. Two opinions still vote; one still transcribes.
-export async function transcribeAll(wav, lanes, { timeoutMs = 20000 } = {}) {
+export async function transcribeAll(wav, lanes, { timeoutMs = 20000, key, model: modelName } = {}) {
   const started = Date.now();
   const settled = await Promise.allSettled(
-    lanes.map((lane) => transcribeLane(wav, lane, { timeoutMs }))
+    lanes.map((lane) => transcribeLane(wav, lane, { timeoutMs, key, model: modelName }))
   );
 
   const results = settled.map((s, i) => {

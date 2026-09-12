@@ -8,7 +8,7 @@
     "mock": "QUORUM_MOCK=1 node server.js",
     "probe": "node probe.js",
     "eval": "node eval.js",
-    "test": "node test/align.test.js && node test/wer.test.js && node test/wav.test.js && node test/dropout.test.js && node test/script.test.js && node test/audio.test.js",
+    "test": "node test/align.test.js && node test/wer.test.js && node test/wav.test.js && node test/dropout.test.js && node test/script.test.js && node test/audio.test.js && node test/multipart.test.js && node test/dropin.test.js",
     "eval:real": "QUORUM_EVAL_SET=real node eval.js"
   }
 }

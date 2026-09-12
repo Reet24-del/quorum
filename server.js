@@ -5,12 +5,11 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LANES, VOCABULARY } from './src/lanes.js';
-import { transcribeAll, MissingKey } from './src/assembly.js';
-import { transcribeAllMock } from './src/mock.js';
-import { merge } from './src/align.js';
-import { guardScript } from './src/script.js';
+import { LANES } from './src/lanes.js';
+import { MissingKey } from './src/assembly.js';
 import { decodeWav } from './public/wav.js';
+import { runQuorum, toAssemblyShape, asWav, durationMs } from './src/quorum.js';
+import { extractAudio } from './src/multipart.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(HERE, 'public');
@@ -73,38 +72,47 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'POST' && req.url === '/api/transcribe') {
     let wav;
-    try {
-      wav = await readBody(req);
-    } catch (err) {
-      return json(res, 413, { error: err.message });
-    }
+    try { wav = await readBody(req); } catch (err) { return json(res, 413, { error: err.message }); }
     if (!wav.length) return json(res, 400, { error: 'empty clip' });
-
     try {
-      const runner = MOCK ? transcribeAllMock : transcribeAll;
-      const { results, wallMs } = await runner(wav, LANES);
-
-      // Only lanes that answered, in the expected script, get a vote. The rest still come
-      // back to the client so the interface can show which opinion is missing, and why.
-      const { voting, offScript } = guardScript(results);
-      for (const r of offScript) r.error = `answered in ${r.script}, so it sat out the vote`;
-      const merged = merge(voting.map((r) => r.words), { vocabulary: VOCABULARY });
-      const slowest = results.reduce((m, r) => Math.max(m, r.ms), 0);
+      const run = await runQuorum(wav, { mock: MOCK });
       return json(res, 200, {
         mock: MOCK,
         bytes: wav.length,
-        lanes: results,
-        votingLaneIds: voting.map((r) => r.id),
-        merged,
-        timing: {
-          wallMs,           // what the user actually waited for all 3
-          slowestLaneMs: slowest,
-          sumOfLanesMs: results.reduce((s, r) => s + r.ms, 0) // what it WOULD cost in series
-        }
+        lanes: run.results,
+        votingLaneIds: run.voting.map((r) => r.id),
+        merged: run.merged,
+        timing: run.timing
       });
     } catch (err) {
       const code = err instanceof MissingKey ? 401 : 502;
       console.error('[transcribe]', err.message);
+      return json(res, code, { error: err.message });
+    }
+  }
+
+  // Drop-in replacement for AssemblyAI's Dictation endpoint: same path, same multipart
+  // "audio" field, same response shape (plus a `quorum` block). Point a client's base URL
+  // here and it gets the four-lane vote with no other change. The caller's Authorization
+  // header is used as the AssemblyAI key, so each caller pays for their own lane calls.
+  if (req.method === 'POST' && req.url === '/transcribe') {
+    let body;
+    try { body = await readBody(req); } catch (err) { return json(res, 413, { error: err.message }); }
+    const audio = extractAudio(body, req.headers['content-type']);
+    if (!audio || !audio.length) {
+      return json(res, 400, { error: 'No audio. Send a multipart form with an "audio" file part, or a raw WAV/PCM body.' });
+    }
+    const wav = asWav(audio);
+    try {
+      const run = await runQuorum(wav, {
+        key: req.headers.authorization,
+        model: req.headers['x-aai-model'],
+        mock: MOCK
+      });
+      return json(res, 200, toAssemblyShape(run, { audioDurationMs: durationMs(wav) }));
+    } catch (err) {
+      const code = err instanceof MissingKey ? 401 : 502;
+      console.error('[drop-in]', err.message);
       return json(res, code, { error: err.message });
     }
   }
