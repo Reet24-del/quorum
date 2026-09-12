@@ -2,14 +2,16 @@
 //
 //   WER = (substitutions + deletions + insertions) / words in the reference
 //
-// Standard scoring: lowercase, strip punctuation, collapse whitespace. Numbers and
+// Standard scoring: lowercase, strip punctuation, collapse whitespace. Combining marks
+// (\p{M}) are kept: in Devanagari the vowel signs are marks, and stripping them split
+// every word into fragments - scoring a script switch as 250%+ word error rate. Numbers and
 // hyphenated tokens are left alone - "sub-second" stays one token in both strings,
 // so it can only ever be right or wrong, never half-credited.
 
 export const tokenize = (s) =>
   String(s)
     .toLowerCase()
-    .replace(/[^\p{L}\p{N}'\-_\s]/gu, ' ')
+    .replace(/[^\p{L}\p{M}\p{N}'\-_\s]/gu, ' ')
     .split(/\s+/)
     .filter(Boolean);
 
