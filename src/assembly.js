@@ -61,7 +61,7 @@ export function parseWords(json) {
   return words;
 }
 
-export async function transcribeLane(wav, lane, { timeoutMs = 8000 } = {}) {
+export async function transcribeLane(wav, lane, { timeoutMs = 20000 } = {}) {
   const key = process.env.ASSEMBLYAI_API_KEY;
   if (!key) throw new MissingKey('ASSEMBLYAI_API_KEY is not set');
 
@@ -101,9 +101,12 @@ export async function transcribeLane(wav, lane, { timeoutMs = 8000 } = {}) {
 // The whole point: every lane leaves at the same time, so three calls cost
 // about as much wall-clock as one.
 //
+// Timeout is 20s: live calls measured 2.3s p50 but up to ~7s p95, and the old 8s
+// limit was dropping every lane of a clip at once.
+//
 // A lane that errors or times out does not fail the request - it drops out and the
 // merge runs on whoever came back. Two opinions still vote; one still transcribes.
-export async function transcribeAll(wav, lanes, { timeoutMs = 8000 } = {}) {
+export async function transcribeAll(wav, lanes, { timeoutMs = 20000 } = {}) {
   const started = Date.now();
   const settled = await Promise.allSettled(
     lanes.map((lane) => transcribeLane(wav, lane, { timeoutMs }))
