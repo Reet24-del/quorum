@@ -377,5 +377,79 @@
         "sumOfLanesMs": 6933
       }
     }
-  }
+  },
+  "narration": [
+    {
+      "at": 1.3,
+      "end": 4.76,
+      "until": 4.9,
+      "text": "This is Quorum. One recording, heard four ways."
+    },
+    {
+      "at": 5.5,
+      "end": 12.71,
+      "until": 12.9,
+      "text": "Dictation gets everyday words right. It stumbles on the ones that matter most: names, tools, and jargon."
+    },
+    {
+      "at": 13.4,
+      "end": 23.26,
+      "until": 23.8,
+      "text": "Quorum sends each recording to AssemblyAI four ways at once: untouched, with faint noise, padded, and slowed. Where they disagree, the words vote."
+    },
+    {
+      "at": 24.05,
+      "end": 25.11,
+      "until": 25.45,
+      "text": "Here’s my voice."
+    },
+    {
+      "at": 30,
+      "end": 36.53,
+      "until": 36.8,
+      "text": "One lane heard “CEO Bhan”, with the highest confidence. Three heard Siobhan, and won the vote."
+    },
+    {
+      "at": 37.2,
+      "end": 40.13,
+      "until": 42.6,
+      "text": "All four answers came back in under four seconds."
+    },
+    {
+      "at": 43.05,
+      "end": 44.01,
+      "until": 44.15,
+      "text": "Watch this one."
+    },
+    {
+      "at": 49.2,
+      "end": 56.55,
+      "until": 57.8,
+      "text": "Three lanes switched to Hindi script. Quorum sat them out and kept the English one. The name isn’t perfect, but it’s readable."
+    },
+    {
+      "at": 58.5,
+      "end": 65.97,
+      "until": 67.6,
+      "text": "On twenty real recordings, Quorum beat every single lane, with forty-five percent fewer errors than the untouched recording."
+    },
+    {
+      "at": 68.5,
+      "end": 74.87,
+      "until": 76.6,
+      "text": "For developers, it’s a drop-in. Change one URL, keep your code, and get the names right."
+    },
+    {
+      "at": 77.4,
+      "end": 81.27,
+      "until": 83.6,
+      "text": "And along the way, four things the documentation doesn’t tell you."
+    },
+    {
+      "at": 84.6,
+      "end": 87.73,
+      "until": 89.2,
+      "text": "Quorum. Change one URL. Get the names right."
+    }
+  ]
 }

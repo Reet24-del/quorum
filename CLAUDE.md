@@ -159,6 +159,11 @@ These override the public docs. They are also recorded in the header of `src/ass
   hidden WebKit view, so anything that runs on real time would drift or freeze.
   Transcripts come from `demo/captures/*.json`, never typed in by hand. Rebuild the
   data and soundtrack with `node demo/build.mjs`.
+- Narration lines live in `NARRATION` in `demo/build.mjs`: `text` is shown, `say` is the
+  phonetic spelling fed to macOS `say` (for example "Shivawn" for Siobhan). The build
+  **fails** if a line overruns its `until` slot or overlaps the owner's clips, so shorten
+  the wording rather than speeding the voice up. `REEL_VOICE` picks the voice (default
+  Daniel).
 
 ## Docs and their state
 

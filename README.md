@@ -185,8 +185,9 @@ alternatives we rejected are in [docs/design.md](docs/design.md).
 ## Demo video
 
 `public/reel.html` is the 90-second demo. Every transcript, confidence and timing in it
-comes from real captures (`demo/captures/`), and the voice is the owner's own
-recordings. Preview it with sound at http://localhost:5173/reel. To rebuild the MP4,
+comes from real captures (`demo/captures/`). The two live demos play the owner's own
+recordings, and an AI narrator (macOS's built-in Daniel voice) describes everything
+else. The narration is timed so the two voices never overlap. Preview it with sound at http://localhost:5173/reel. To rebuild the MP4,
 using only Apple frameworks (no ffmpeg, no browser install):
 
 ```bash
