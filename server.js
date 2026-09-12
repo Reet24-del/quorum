@@ -9,9 +9,11 @@ import { LANES, VOCABULARY } from './src/lanes.js';
 import { transcribeAll, MissingKey } from './src/assembly.js';
 import { transcribeAllMock } from './src/mock.js';
 import { merge } from './src/align.js';
+import { decodeWav } from './public/wav.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(HERE, 'public');
+const EVAL_DIR = path.join(HERE, 'eval');
 const PORT = Number(process.env.PORT || 5173);
 const MOCK = process.env.QUORUM_MOCK === '1';
 
@@ -101,6 +103,37 @@ const server = http.createServer(async (req, res) => {
       console.error('[transcribe]', err.message);
       return json(res, code, { error: err.message });
     }
+  }
+
+  // Saves a real recording straight into the eval set, so measuring on your own voice
+  // is one gesture per utterance rather than a convert-rename-edit-JSON chore.
+  if (req.method === 'POST' && req.url === '/api/eval-clip') {
+    const truth = decodeURIComponent(req.headers['x-truth'] || '').trim();
+    if (!truth) return json(res, 400, { error: 'Missing the sentence the clip contains (X-Truth header).' });
+    let wav;
+    try { wav = await readBody(req); } catch (err) { return json(res, 413, { error: err.message }); }
+    let info;
+    try { info = decodeWav(wav); } catch { return json(res, 400, { error: 'That upload is not a WAV file.' }); }
+    if (info.durationSec < 0.08 || info.durationSec > 120) {
+      return json(res, 400, { error: `Clip is ${info.durationSec.toFixed(2)}s; it needs to be between 0.08s and 2 minutes.` });
+    }
+    const manifestPath = path.join(EVAL_DIR, 'manifest.json');
+    const items = JSON.parse(await fs.readFile(manifestPath, 'utf8').catch(() => '[]'));
+    const next = items.reduce((m, i) => Math.max(m, parseInt(i.file, 10) || 0), 0) + 1;
+    const file = `${String(next).padStart(2, '0')}.wav`;
+    await fs.mkdir(path.join(EVAL_DIR, 'clips'), { recursive: true });
+    await fs.writeFile(path.join(EVAL_DIR, 'clips', file), wav);
+    items.push({ file, truth, synthetic: false, recorded: new Date().toISOString() });
+    await fs.writeFile(manifestPath, JSON.stringify(items, null, 2) + '\n');
+    return json(res, 200, {
+      file, seconds: Number(info.durationSec.toFixed(2)),
+      real: items.filter((i) => !i.synthetic).length
+    });
+  }
+
+  if (req.method === 'GET' && req.url === '/api/eval-clips') {
+    const items = JSON.parse(await fs.readFile(path.join(EVAL_DIR, 'manifest.json'), 'utf8').catch(() => '[]'));
+    return json(res, 200, { real: items.filter((i) => !i.synthetic) });
   }
 
   if (req.method === 'GET') return serveStatic(req, res);

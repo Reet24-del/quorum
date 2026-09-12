@@ -97,10 +97,15 @@ npm run probe          # what the endpoint actually does, ~15 seconds
 npm start
 npm test               # plain node scripts, no framework
 npm run eval           # WER table from eval/clips/ + eval/manifest.json
+npm run eval:real      # the same, on your real recordings only
 ```
 
-To add an eval clip without a microphone (placeholder only, since real speech is the
-real test):
+**Record the eval set in your own voice** at http://localhost:5173/record.html. It gives
+you a sentence to read; hold space, say it, let go, and it's saved straight into
+`eval/clips/` with the sentence as its answer key. About twenty takes, then
+`npm run eval:real`.
+
+To add a clip without a microphone (placeholder only; real speech is the real test):
 
 ```bash
 say -v Samantha -o /tmp/c.aiff "your sentence here"

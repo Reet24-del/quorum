@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quorum · Record the eval set</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:wght@400;500;600;700&family=Spectral:ital,wght@0,300;0,400;1,400&display=swap">
+<style>
+  /* Same tokens as index.html (docs/design.md 11). Brass is reserved for the vote's
+     decision, so it does not appear on this page at all. */
+  :root {
+    --ground: #15110D; --raise: #1D1813; --sunk: #100D09;
+    --ink: #F2E9DC; --muted: #A89684; --faint: #756554;
+    --rule: #2B2219; --rule-lit: #3A2E22; --clay: #C4705E; --ember: #E0563F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font: 15px/1.6 Karla, ui-sans-serif, system-ui, sans-serif;
+    padding: 64px 28px 120px; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 {
+    font: 300 36px/1.1 Spectral, Georgia, serif; letter-spacing: -0.02em; margin: 0 0 10px;
+  }
+  .lede { color: var(--muted); margin: 0 0 36px; max-width: 58ch; }
+  .lede a { color: var(--ink); }
+
+  label, h2 {
+    display: block; font: 400 10px/1 "IBM Plex Mono", monospace;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--faint); margin: 0 0 12px;
+  }
+  textarea {
+    width: 100%; min-height: 96px; resize: vertical;
+    background: var(--sunk); color: var(--ink); border: 1px solid var(--rule);
+    border-radius: 2px; padding: 16px 18px;
+    font: 300 22px/1.45 Spectral, Georgia, serif;
+  }
+  textarea:focus { outline: 1px solid var(--rule-lit); outline-offset: 0; }
+
+  .row { display: flex; gap: 10px; margin: 12px 0 28px; }
+  .ghost {
+    background: none; border: 1px solid var(--rule); color: var(--muted);
+    border-radius: 2px; padding: 6px 12px; cursor: pointer;
+    font: 500 12px Karla, sans-serif;
+  }
+  .ghost:hover { border-color: var(--rule-lit); color: var(--ink); }
+
+  .mic {
+    width: 100%; padding: 26px; cursor: pointer; border-radius: 2px;
+    background: var(--raise); border: 1px solid var(--rule); color: var(--ink);
+    font: 600 15px Karla, sans-serif; letter-spacing: .06em; text-transform: uppercase;
+    user-select: none; -webkit-user-select: none;
+  }
+  .mic:hover { border-color: var(--rule-lit); }
+  .mic.live { background: #241410; border-color: var(--ember); }
+  .mic .dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--faint); margin-right: 12px; vertical-align: 2px;
+  }
+  .mic.live .dot { background: var(--ember); animation: pulse 1.1s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .2; } }
+  .mic:focus-visible, .ghost:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+
+  .status {
+    min-height: 24px; margin: 14px 0 0; text-align: center;
+    font: 400 12px "IBM Plex Mono", monospace; color: var(--muted);
+  }
+  .status.err { color: var(--clay); }
+
+  section { margin-top: 52px; }
+  .count { font: 300 44px/1 Spectral, Georgia, serif; }
+  .count small { font: 400 12px "IBM Plex Mono", monospace; color: var(--faint); margin-left: 10px; }
+  ol { list-style: none; margin: 18px 0 0; padding: 0; }
+  li {
+    display: grid; grid-template-columns: 64px 1fr; gap: 16px;
+    padding: 11px 0; border-top: 1px solid var(--rule); align-items: baseline;
+  }
+  li .f { font: 400 11px "IBM Plex Mono", monospace; color: var(--faint); }
+  li .t { font: 300 16px/1.5 Spectral, Georgia, serif; color: #C9BCAC; }
+  .empty { color: var(--faint); font: italic 300 16px Spectral, Georgia, serif; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Record the eval set</h1>
+  <p class="lede">
+    Read the sentence aloud the way you'd dictate it: normal pace, no careful enunciation.
+    Each take is saved straight into <b>eval/clips/</b> with the sentence as its answer
+    key. Run <b>npm run eval:real</b> when you have about twenty.
+    <a href="/">Back to the demo</a>
+  </p>
+
+  <label for="truth">Say exactly this</label>
+  <textarea id="truth" spellcheck="false"></textarea>
+  <div class="row">
+    <button class="ghost" id="next">Next suggestion</button>
+    <span class="ghost" style="cursor:default;border:none;padding-left:0" id="pos"></span>
+  </div>
+
+  <button class="mic" id="mic"><span class="dot"></span><span id="micLabel">Hold to record</span></button>
+  <div class="status" id="status">or hold space (not while typing)</div>
+
+  <section>
+    <h2>Real recordings so far</h2>
+    <div class="count" id="count">0<small>of about 20</small></div>
+    <ol id="list"></ol>
+  </section>
+</div>
+<script type="module" src="./record.js"></script>
+</body>
+</html>

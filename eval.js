@@ -32,9 +32,12 @@ if (!fs.existsSync(MANIFEST)) {
   process.exit(1);
 }
 
-const items = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'));
+// QUORUM_EVAL_SET = all | real | synthetic. "real" is the number worth quoting.
+const SET = process.env.QUORUM_EVAL_SET || 'all';
+const items = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'))
+  .filter((i) => SET === 'all' || (SET === 'real' ? !i.synthetic : Boolean(i.synthetic)));
 if (!Array.isArray(items) || !items.length) {
-  console.error('  manifest.json must be a non-empty array'); process.exit(1);
+  console.error(`  No clips in set "${SET}". Record some at http://localhost:5173/record.html`); process.exit(1);
 }
 
 const pad = (s, n) => String(s).padEnd(n);

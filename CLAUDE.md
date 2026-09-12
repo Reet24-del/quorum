@@ -30,6 +30,7 @@ npm start                     # live server, needs ASSEMBLYAI_API_KEY
 npm run probe                 # interrogates the live endpoint; run before trusting any API assumption
 npm run eval                  # WER table from eval/clips/ + eval/manifest.json
 QUORUM_MOCK=1 node eval.js    # exercises the eval harness without spending API calls
+npm run eval:real             # only real recordings (QUORUM_EVAL_SET=real) - the number worth quoting
 ```
 
 There is no test framework. Each test file prints PASS/FAIL lines and exits non-zero on
@@ -110,6 +111,10 @@ These override the public docs. They are also recorded in the header of `src/ass
 - `eval/clips/` holds **synthesised (macOS `say`) placeholders**, marked `synthetic: true`
   in the manifest. TTS is too clean to be a meaningful eval, and `eval.js` prints a warning
   whenever they're used. The submission number needs real recorded speech.
+  Record it at `http://localhost:5173/record.html`. That page POSTs to `/api/eval-clip`,
+  which writes the next numbered WAV and appends `synthetic: false` to the manifest.
+  `record.js` duplicates `app.js`'s capture code on purpose, so the demo's capture path
+  (which can't be tested headlessly) stays untouched.
 - `test/wav.test.js` reads `eval/clips/01.wav` and skips those assertions if the file is
   missing.
 - `index.html` and `app.js` share a set of CSS class names (`.fixed`, `.won`, `.lost`,
