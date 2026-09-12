@@ -5,7 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LANES } from './src/lanes.js';
+import { LANES, VOCABULARY } from './src/lanes.js';
 import { transcribeAll, MissingKey } from './src/assembly.js';
 import { transcribeAllMock } from './src/mock.js';
 import { merge } from './src/align.js';
@@ -82,7 +82,7 @@ const server = http.createServer(async (req, res) => {
       // Only lanes that answered get a vote. Failed ones still come back to the
       // client so the interface can show which opinion is missing.
       const voting = results.filter((r) => !r.error);
-      const merged = merge(voting.map((r) => r.words));
+      const merged = merge(voting.map((r) => r.words), { vocabulary: VOCABULARY });
       const slowest = results.reduce((m, r) => Math.max(m, r.ms), 0);
       return json(res, 200, {
         mock: MOCK,

@@ -42,3 +42,19 @@ export const LANES = [
     transform: { op: 'stretch', arg: 0.95 }
   }
 ];
+
+// Terms the speaker is known to use. The API ignores vocabulary hints, so the MERGE
+// uses these to break ties between spellings the lanes actually heard (isKnown in
+// src/align.js). Put your own demo words here - names especially.
+//
+// Provenance matters for the eval: this list is the original lane vocabulary, written
+// before the hard eval clips (07-12) existed. It deliberately does NOT contain their
+// answers, so eval numbers with it are not tuned to the test set.
+export const VOCABULARY = [
+  'kubectl', 'Docker', 'Terraform', 'Postgres', 'Redis', 'nginx',
+  'staging', 'prod', 'rollback', 'webhook', 'OAuth', 'JWT',
+  'AssemblyAI', 'Supabase', 'Vercel', 'repo', 'commit', 'rebase',
+  'idempotent', 'gRPC',
+  'Priya', 'Reet', 'Aanya', 'Marcus', 'Yuki', 'Ines', 'Rahul',
+  'Bangalore', 'Lisbon', 'Toronto', 'Nairobi'
+];

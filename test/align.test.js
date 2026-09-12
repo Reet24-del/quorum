@@ -79,6 +79,15 @@ check('majority spelling wins inside a ballot', spacing.text, 'Roll back');
 const spacingTie = merge([spaced('Rollback', 0.95), spaced('Roll back', 0.40)]);
 check('spelling tie breaks on confidence', spacingTie.text, 'Rollback');
 
+// Vocabulary breaks ties between spellings the lanes heard - and does nothing else.
+const ngozi = [spaced('Angozi', 0.477), spaced('Angozi', 0.477), spaced('Ngozi', 0.477), spaced('Angozi', 0.477)];
+check('without vocabulary the majority wins', merge(ngozi).text, 'Angozi');
+check('vocabulary promotes a known minority spelling', merge(ngozi, { vocabulary: ['Ngozi'] }).text, 'Ngozi');
+const argo = [spaced('Argos', 0.30), spaced('Argos', 0.30), spaced('Ago', 0.37)];
+check('vocabulary never writes a word no lane heard', merge(argo, { vocabulary: ['ArgoCD'] }).text, 'Argos');
+check('vocabulary never rewrites agreement',
+  merge([spaced('Angozi', 0.4), spaced('Angozi', 0.4)], { vocabulary: ['Ngozi'] }).text, 'Angozi');
+
 // Unanimous input should pass straight through with nothing disputed.
 const u = merge([A, A, A]);
 check('unanimous lanes pass through', u.text, A.map((w) => w.text).join(' '));

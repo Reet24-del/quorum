@@ -13,7 +13,8 @@ export const DEFAULTS = {
   nullConf: 0.55,  // how confident we treat "this lane said nothing here"
   wText: 0.65,     // alignment: weight on word similarity
   wTime: 0.35,     // alignment: weight on timing overlap
-  gapPenalty: -0.5
+  gapPenalty: -0.5,
+  vocabBonus: 0.3  // added to a ballot that spells a known term (opts.vocabulary)
 };
 
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9'_]+/g, '');
@@ -183,10 +184,21 @@ function toSegments(cols) {
 const hasTimings = (lanes) =>
   lanes.some((words) => words.some((w) => Number(w.end) > 0));
 
+// Client-side vocabulary. The API ignores keyterms, so known terms are applied here -
+// but only as a tie-breaker between spellings some lane actually produced. It can promote
+// "Ngozi" over "Angozi" when a lane heard "Ngozi"; it can never write a word no lane
+// heard, so it cannot hallucinate a term into the transcript. Anchors are untouched.
+function isKnown(text, vocab) {
+  if (!vocab.size || !text) return false;
+  if (vocab.has(norm(text))) return true;
+  return text.split(/\s+/).some((t) => vocab.has(norm(t)));
+}
+
 export function merge(lanes, opts = {}) {
   const o = { ...DEFAULTS, ...opts };
   if (opts.wTime === undefined && !hasTimings(lanes)) { o.wTime = 0; o.wText = 1; }
   const L = lanes.length;
+  const vocab = new Set((o.vocabulary || []).map(norm).filter(Boolean));
   const weights = o.laneWeights || new Array(L).fill(1);
   const cols = buildColumns(lanes, o);
   const segments = [];
@@ -230,8 +242,9 @@ export function merge(lanes, opts = {}) {
     for (const g of groups.values()) {
       const votes = g.lanes.length;
       const conf = g.confs.reduce((a, b) => a + b, 0) / votes;
-      const score = o.alpha * (votes / L) + (1 - o.alpha) * conf;
-      const ballot = { text: electForm(g.members), lanes: g.lanes, votes, confidence: conf, score };
+      const known = isKnown(g.members[0].text, vocab);
+      const score = o.alpha * (votes / L) + (1 - o.alpha) * conf + (known ? o.vocabBonus : 0);
+      const ballot = { text: electForm(g.members), lanes: g.lanes, votes, confidence: conf, score, known };
       ballots.push(ballot);
       if (!winner || score > winner.score ||
           (score === winner.score && conf > winner.confidence)) winner = ballot;

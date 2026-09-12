@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LANES } from './src/lanes.js';
+import { LANES, VOCABULARY } from './src/lanes.js';
 import { transcribeAll } from './src/assembly.js';
 import { transcribeAllMock } from './src/mock.js';
 import { merge } from './src/align.js';
@@ -41,8 +41,14 @@ const pad = (s, n) => String(s).padEnd(n);
 const pct = (x) => (x * 100).toFixed(1).padStart(5) + '%';
 const runner = MOCK ? transcribeAllMock : transcribeAll;
 
+// The ceiling: what the tie-breaker could do if the vocabulary held every word the
+// speaker said. Reported separately and labelled - it is NOT a fair result.
+const ORACLE = [...new Set(items.flatMap((i) => i.truth.split(/\s+/)))];
+
 const totals = LANES.map(() => ({ err: 0, n: 0 }));
 const mergedTotal = { err: 0, n: 0 };
+const vocabTotal = { err: 0, n: 0 };
+const oracleTotal = { err: 0, n: 0 };
 let mergeWins = 0, mergeTies = 0, mergeLosses = 0;
 const wallTimes = [];
 const rows = [];
@@ -66,10 +72,15 @@ for (const [i, item] of items.entries()) {
   const laneScores = results.map((r) => wer(item.truth, r.text));
   const m = merge(results.map((r) => r.words));
   const mergedScore = wer(item.truth, m.text);
+  const words = results.map((r) => r.words);
+  const vocabScore = wer(item.truth, merge(words, { vocabulary: VOCABULARY }).text);
+  const oracleScore = wer(item.truth, merge(words, { vocabulary: ORACLE }).text);
 
   laneScores.forEach((s, k) => { totals[k].err += s.sub + s.del + s.ins; totals[k].n += s.n; });
   mergedTotal.err += mergedScore.sub + mergedScore.del + mergedScore.ins;
   mergedTotal.n += mergedScore.n;
+  vocabTotal.err += vocabScore.sub + vocabScore.del + vocabScore.ins; vocabTotal.n += vocabScore.n;
+  oracleTotal.err += oracleScore.sub + oracleScore.del + oracleScore.ins; oracleTotal.n += oracleScore.n;
 
   const best = Math.min(...laneScores.map((s) => s.wer));
   if (mergedScore.wer < best - 1e-9) mergeWins++;
@@ -102,6 +113,9 @@ const relative = bestLane.rate ? (bestLane.rate - mergedRate) / bestLane.rate : 
 console.log(`\n  best single lane   ${LANES[bestLane.k]?.name} at ${pct(bestLane.rate ?? 0)}`);
 console.log(`  quorum             ${pct(mergedRate)}`);
 console.log(`  relative reduction ${(relative * 100).toFixed(1)}%`);
+const rate = (t) => (t.n ? t.err / t.n : 0);
+console.log(`\n  quorum + vocabulary         ${pct(rate(vocabTotal))}   fixed list in src/lanes.js, written before the hard clips`);
+console.log(`  quorum + oracle vocabulary  ${pct(rate(oracleTotal))}   CEILING ONLY - the vocabulary is the answer key`);
 console.log(`\n  merge beat the best lane on ${mergeWins}/${rows.length} utterances` +
   `  (${mergeTies} tied, ${mergeLosses} worse)`);
 
