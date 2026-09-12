@@ -9,6 +9,17 @@ parallel, each copy transformed differently, then merges the transcripts using p
 confidence. Built for the AssemblyAI Dictation hackathon, submission deadline
 **13 Sep 2026**. Node 18+, zero dependencies, no build step.
 
+## Repository
+
+`github.com/Reet24-del/quorum` (private until submission). **Commit and push after
+each completed change** — the owner asked for the repo to track the work continuously,
+not in one batch at the end. Commit messages say *why*, and end with the Claude
+co-author trailer.
+
+Git credentials and commit identity are configured **repo-locally**
+(`credential.helper = !gh auth git-credential`, noreply email), not globally — a fresh
+clone needs `gh auth login` and those two settings again.
+
 ## Commands
 
 ```bash
