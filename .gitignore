@@ -9,3 +9,4 @@ node_modules/
 # demo reel: intermediate files (the .m4a soundtrack and data.json are committed)
 public/reel/soundtrack.wav
 *.video-only.mp4
+.vercel

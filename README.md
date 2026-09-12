@@ -4,6 +4,9 @@
 
 Built for the AssemblyAI Dictation API hackathon, 9–13 Sep 2026.
 
+**Live: https://quorum-iota-three.vercel.app.** Try it at `/try`. Paste your own
+AssemblyAI key there for live transcription; without one it shows a labelled sample.
+
 ---
 
 ## The finding
