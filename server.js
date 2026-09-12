@@ -9,6 +9,7 @@ import { LANES, VOCABULARY } from './src/lanes.js';
 import { transcribeAll, MissingKey } from './src/assembly.js';
 import { transcribeAllMock } from './src/mock.js';
 import { merge } from './src/align.js';
+import { guardScript } from './src/script.js';
 import { decodeWav } from './public/wav.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -81,9 +82,10 @@ const server = http.createServer(async (req, res) => {
       const runner = MOCK ? transcribeAllMock : transcribeAll;
       const { results, wallMs } = await runner(wav, LANES);
 
-      // Only lanes that answered get a vote. Failed ones still come back to the
-      // client so the interface can show which opinion is missing.
-      const voting = results.filter((r) => !r.error);
+      // Only lanes that answered, in the expected script, get a vote. The rest still come
+      // back to the client so the interface can show which opinion is missing, and why.
+      const { voting, offScript } = guardScript(results);
+      for (const r of offScript) r.error = `answered in ${r.script}, so it sat out the vote`;
       const merged = merge(voting.map((r) => r.words), { vocabulary: VOCABULARY });
       const slowest = results.reduce((m, r) => Math.max(m, r.ms), 0);
       return json(res, 200, {

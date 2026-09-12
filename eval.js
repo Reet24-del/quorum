@@ -14,6 +14,7 @@ import { LANES, VOCABULARY } from './src/lanes.js';
 import { transcribeAll } from './src/assembly.js';
 import { transcribeAllMock } from './src/mock.js';
 import { merge } from './src/align.js';
+import { guardScript } from './src/script.js';
 import { wer } from './src/wer.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -52,6 +53,7 @@ const totals = LANES.map(() => ({ err: 0, n: 0 }));
 const mergedTotal = { err: 0, n: 0 };
 const vocabTotal = { err: 0, n: 0 };
 const oracleTotal = { err: 0, n: 0 };
+let offScriptCalls = 0, allOffScriptClips = 0;
 let mergeWins = 0, mergeTies = 0, mergeLosses = 0;
 const wallTimes = [];
 const rows = [];
@@ -73,9 +75,14 @@ for (const [i, item] of items.entries()) {
   wallTimes.push(wallMs);
 
   const laneScores = results.map((r) => wer(item.truth, r.text));
-  const m = merge(results.map((r) => r.words));
+  // Same voting rule as the server: failed lanes and lanes in another script sit out.
+  // (Previously the eval let failed lanes vote as empty lanes, unlike the server.)
+  const guard = guardScript(results);
+  offScriptCalls += guard.offScript.length + (guard.allOffScript ? guard.voting.length : 0);
+  if (guard.allOffScript) allOffScriptClips++;
+  const words = guard.voting.map((r) => r.words);
+  const m = merge(words);
   const mergedScore = wer(item.truth, m.text);
-  const words = results.map((r) => r.words);
   const vocabScore = wer(item.truth, merge(words, { vocabulary: VOCABULARY }).text);
   const oracleScore = wer(item.truth, merge(words, { vocabulary: ORACLE }).text);
 
@@ -127,6 +134,8 @@ if (wallTimes.length) {
   console.log(`  fan-out latency    p50 ${sorted[Math.floor(sorted.length / 2)]} ms` +
     `   p95 ${sorted[Math.floor(sorted.length * 0.95)]} ms`);
 }
+console.log(`  script switches    ${offScriptCalls} lane calls answered in another script; ` +
+  `${allOffScriptClips} clip(s) had no lane in the expected script`);
 
 // Two ways this table can lie. Say so loudly, right under the number.
 if (MOCK) {
