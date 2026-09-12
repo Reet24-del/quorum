@@ -57,7 +57,16 @@ function say(msg, isErr = false) {
 
 async function refresh() {
   try {
-    const { real } = await (await fetch('/api/eval-clips')).json();
+    const res = await fetch('/api/eval-clips');
+    if (res.status === 404) {
+      // Hosted: saving writes into the project folder, which only exists on your machine.
+      micBtn.disabled = true;
+      micLabel.textContent = 'Recording works locally';
+      countEl.innerHTML = '–<small>on the hosted site</small>';
+      listEl.innerHTML = '';
+      return say('Recording saves clips into the project folder, so it only works when Quorum runs on your own machine (npm start).', true);
+    }
+    const { real } = await res.json();
     countEl.innerHTML = `${real.length}<small>of about 20</small>`;
     listEl.innerHTML = real.length
       ? real.slice().reverse().map((i) =>
@@ -69,7 +78,7 @@ async function refresh() {
 }
 
 async function start() {
-  if (recording) return;
+  if (recording || micBtn.disabled) return; // hosted: nowhere to save, so don't record
   if (!truthEl.value.trim()) return say('Type the sentence you are about to say first.', true);
   recording = true;
   chunks = [];

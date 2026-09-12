@@ -161,6 +161,23 @@ Keep `;type=audio/wav` on the `-F`. AssemblyAI rejects an audio part labelled
 `application/octet-stream`, which is curl's default, with **415 Unsupported Media Type**.
 Quorum accepts either label, but the command above is the one that works against both.
 
+## Deploy
+
+The repo deploys to Vercel as it is. `public/` is served as static files, and `api/` holds
+three functions: `/api/lanes`, `/api/transcribe`, and the drop-in, which is served at
+`/transcribe`. `.vercelignore` keeps the eval recordings out of the upload.
+
+**The hosted site has no AssemblyAI key of its own.** A visitor can paste theirs into the
+demo page. It stays in their browser and is forwarded with each clip, and is never stored.
+Without a key, the demo runs in clearly labelled sample mode. The public drop-in only ever
+uses the caller's key. Recording (`/record`) needs the local server, because it writes
+into the repo.
+
+```bash
+npx vercel deploy          # preview
+npx vercel deploy --prod   # production
+```
+
 ## How the merge works
 
 All in `src/align.js`:

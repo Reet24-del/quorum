@@ -1,0 +1,11 @@
+# The hosted site needs public/, api/, src/ and vercel.json - nothing else.
+# eval/ holds the owner's own voice recordings: never upload them.
+eval/
+test/
+docs/
+demo/
+*.mp4
+public/reel/soundtrack.wav
+node_modules/
+.env
+.env.*

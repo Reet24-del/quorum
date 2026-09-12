@@ -69,6 +69,14 @@ public/app.js  --raw WAV-->  server.js  --transformed copy per lane-->  Assembly
   `/api/eval-clip` writes files. Tokens, nav, buttons and footer are in
   `public/site.css`. The nav markup is copied into each page (there's no build step), so
   change all three when you change it.
+- **Hosted (Vercel):** `api/lanes.js`, `api/transcribe.js` and `api/dropin.js` are
+  Web-standard function versions of the server's routes, and they share `src/quorum.js`.
+  The deployment has no key of its own. `/api/transcribe` uses the visitor's
+  `Authorization` header (the demo page's bring-your-own-key box, kept in localStorage)
+  and falls back to the labelled sample. `api/dropin.js` requires the caller's key and
+  **must never fall back to an env key**; `test/api.test.js` pins that. There's no
+  hosted `/api/eval-clip`, so `record.js` shows a local-only notice on 404.
+  `.vercelignore` keeps `eval/` (the owner's voice) out of every upload.
 - `public/wav.js` is imported by the browser (`app.js`) and by Node (`src/audio.js`,
   tests), so it must stay environment-neutral: no DOM, no Node `Buffer` APIs.
 - `src/script.js` `guardScript()` runs before every merge, **in both `src/quorum.js` and

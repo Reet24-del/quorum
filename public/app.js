@@ -65,6 +65,8 @@ async function stopRecording() {
   const flat = new Float32Array(total);
   let at = 0;
   for (const c of chunks) { flat.set(c, at); at += c.length; }
+  seeded = false;
+  replayBtn.textContent = 'Replay last clip';
   await send(encodeWav(flat, rate));
 }
 
@@ -82,7 +84,7 @@ async function send(wav) {
   try {
     res = await fetch('/api/transcribe', {
       method: 'POST',
-      headers: { 'Content-Type': 'audio/wav' },
+      headers: { 'Content-Type': 'audio/wav', ...(readKey() ? { Authorization: readKey() } : {}) },
       body: wav
     });
     data = await res.json();
@@ -90,9 +92,12 @@ async function send(wav) {
     return showError('Could not reach the server.', 'Is it still running on port 5173?');
   }
   if (!res.ok) {
-    const hint = res.status === 401
-      ? 'Set ASSEMBLYAI_API_KEY, or run <code>npm run mock</code> to work without one.'
-      : 'Check the server log for the full response.';
+    const msg = String(data.error || '');
+    const hint = /HTTP 401|Invalid API key/i.test(msg)
+      ? 'AssemblyAI rejected that key. Check it, then save it again.'
+      : res.status === 401
+        ? 'Set ASSEMBLYAI_API_KEY, or run <code>npm run mock</code> to work without one.'
+        : 'Check the server log for the full response.';
     return showError(esc(data.error || `HTTP ${res.status}`), hint);
   }
   render(data);
@@ -189,19 +194,59 @@ replayBtn.addEventListener('click', () => { if (lastWav) send(lastWav); });
 
 const WORDS = ['', 'one way', 'two ways', 'three ways', 'four ways', 'five ways', 'six ways'];
 
+// ---------------------------------------------------------------- key & mode
+// The hosted site has no key of its own, so a visitor can bring theirs. It lives in this
+// browser only and rides along with each clip as the Authorization header; the function
+// forwards it to AssemblyAI and keeps nothing.
+const KEY_SLOT = 'quorum.assemblyai-key';
+function readKey() { try { return localStorage.getItem(KEY_SLOT) || ''; } catch { return ''; } }
+function writeKey(k) { try { if (k) localStorage.setItem(KEY_SLOT, k); else localStorage.removeItem(KEY_SLOT); } catch {} }
+const byok = document.getElementById('byok');
+const keyInput = document.getElementById('keyInput');
+const keyClear = document.getElementById('keyClear');
+let serverMock = false, hosted = false, seeded = false;
+
+function applyMode() {
+  const own = readKey();
+  const sample = serverMock && !own;
+  modeBadge.textContent = own ? 'live · your key' : 'sample mode';
+  modeBadge.hidden = !(sample || (hosted && own));
+  document.getElementById('mockNote').hidden = !sample;
+  if (hosted) {
+    document.getElementById('mockWhy').textContent =
+      'This public demo has no AssemblyAI key of its own, so every recording returns the same captured sample, not what you said. Add your own key below to hear your voice, live.';
+    byok.hidden = false;
+    keyClear.hidden = !own;
+    keyInput.placeholder = own ? 'Key saved in this browser' : 'Your AssemblyAI API key';
+  }
+  // In sample mode the audio is ignored, so seed a clip and let the view run with no mic.
+  if (sample && !lastWav) {
+    lastWav = encodeWav(new Float32Array(1600), 16000);
+    seeded = true;
+    replayBtn.textContent = 'Run a sample';
+    replayBtn.hidden = false;
+  }
+  if (!sample && seeded) {
+    lastWav = null; seeded = false;
+    replayBtn.hidden = true; replayBtn.textContent = 'Replay last clip';
+  }
+}
+
+document.getElementById('keySave').addEventListener('click', () => {
+  const k = keyInput.value.trim();
+  if (!k) return;
+  writeKey(k);
+  keyInput.value = '';
+  applyMode();
+});
+keyClear.addEventListener('click', () => { writeKey(''); applyMode(); });
+
 fetch('/api/lanes').then((r) => r.json()).then((d) => {
   // The tagline states the lane count, so it has to come from the config rather
   // than being written into the markup - the count changes when lanes.js changes.
   const n = d.lanes?.length || 0;
   if (n) tag.textContent = `One recording, heard ${WORDS[n] || n + ' ways'}. Keep the best words.`;
-  if (d.mock) {
-    modeBadge.textContent = 'sample mode';
-    document.getElementById('mockNote').hidden = false;
-    modeBadge.hidden = false;
-    // Mock ignores the audio, so seed a clip and let the whole view be
-    // exercised with no microphone at all.
-    lastWav = encodeWav(new Float32Array(1600), 16000);
-    replayBtn.textContent = 'Run a sample';
-    replayBtn.hidden = false;
-  }
+  serverMock = Boolean(d.mock);
+  hosted = Boolean(d.hosted);
+  applyMode();
 }).catch(() => {});
