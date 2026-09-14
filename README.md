@@ -7,6 +7,8 @@ Built for the AssemblyAI Dictation API hackathon, 9–13 Sep 2026.
 **Live: https://quorum-iota-three.vercel.app.** Try it at `/try`. Paste your own
 AssemblyAI key there for live transcription; without one it shows a labelled sample.
 
+![Four lanes transcribe one real recording. The untouched lane hears "CEO Bhan"; three lanes hear "Siobhan", and the vote picks it.](docs/screenshots/2-live-demo-siobhan.png)
+
 ---
 
 ## The finding
@@ -90,6 +92,22 @@ Other things the probe measured, all of which differ from the public docs:
 - typically **1.5–3.5s per call**, occasionally ~7s, not 134ms (responses include an
   `llm_response` field)
 - per-word `confidence` is returned, but **no word timings**, so alignment is text-only
+
+---
+
+## Screenshots
+
+Frames from the demo video. Every transcript and confidence score in them is a real API
+response, and the voice is the owner's own.
+
+| | |
+|---|---|
+| ![Title card](docs/screenshots/1-title.png) | ![Live demo](docs/screenshots/2-live-demo-siobhan.png) |
+| **Quorum.** One recording, heard four ways. | **The vote fixes a name.** Untouched audio heard "CEO Bhan" at 0.70 confidence. Three lanes heard Siobhan and out-voted it. |
+| ![Language switch](docs/screenshots/3-language-switch.png) | ![Results chart](docs/screenshots/4-results.png) |
+| **When the model switches language.** Three lanes answered in Hindi script and sat out. The English lane was kept. | **Results on 20 real recordings.** Word error rate falls from 30.5% to 16.7%. |
+| ![Drop-in API](docs/screenshots/5-drop-in-api.png) | |
+| **For builders.** Change one URL. AssemblyAI returns "CEO Bhan"; Quorum returns "Siobhan". | |
 
 ---
 
